@@ -127,3 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Other I added
+.idea
+*.csv
+Trial1_Fast
+__pycache__
+.DS_Store
+
