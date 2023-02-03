@@ -5,13 +5,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import argrelextrema
 
+
 def prompt(command):
     """
-    Given a command for the shell, returns the output of the command as a 
+    Given a command for the shell, returns the output of the command as a
     string
-    
+
     :param command: the terminal command to send
-    
+
     :return: the output of the command, as a string
     """
     result = os.popen(command)
@@ -20,23 +21,25 @@ def prompt(command):
 
     return retstring
 
+
 def trim_data(df, start, stop):
     return df.iloc[start:stop]
 
+
 def plot_extrema(df, column, margin=25, draw_line=True):
-    ilocs_min = argrelextrema(df[column].values, np.less_equal, order=margin//2)[0]
+    ilocs_min = argrelextrema(df[column].values, np.less_equal, order=margin // 2)[0]
     ilocs_max = argrelextrema(df[column].values, np.greater_equal, order=margin)[0]
 
     # filter elements that are peaks and plot
-    df.iloc[ilocs_max][column].plot(style='v', lw=10, color='green');
-    df.iloc[ilocs_min][column].plot(style='^', lw=10, color='red');
+    df.iloc[ilocs_max][column].plot(style="v", lw=10, color="green")
+    df.iloc[ilocs_min][column].plot(style="^", lw=10, color="red")
 
     # draw the average line of the extrema
     top_line = df.iloc[ilocs_max][column].mean()
     bot_line = df.iloc[ilocs_min][column].mean()
-    if (draw_line):
-        plt.axhline(y = top_line, color = 'g', linestyle = '-')
-        plt.axhline(y = bot_line, color = 'r', linestyle = '-')
+    if draw_line:
+        plt.axhline(y=top_line, color="g", linestyle="-")
+        plt.axhline(y=bot_line, color="r", linestyle="-")
 
     return top_line, bot_line
 
@@ -68,9 +71,9 @@ def main():
 
     df.plot(y=y_choice, kind="line")
     top, bottom = plot_extrema(df, y_choice, margin=120)
-    print(top, bottom, top-bottom)
+    print(top, bottom, top - bottom)
 
     plt.show()
 
-main()
 
+main()
