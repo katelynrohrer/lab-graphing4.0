@@ -23,7 +23,21 @@ def prompt(command):
 
 
 def trim_data(df, start, stop):
-    return df.iloc[start:stop]
+    """
+    Trims the x-axis in terms of seconds
+    :param df: Dataframe containing a ["Seconds"] column
+    :param start: Start time int in seconds
+    :param stop: Stop time int in seconds
+    :return: The time cropped dataframe
+    """
+    seconds = list(df["Seconds"])  # wasn't sure how to index into df
+    start_index, stop_index = 0, len(seconds)-1
+    for i in range(len(seconds)):
+        if seconds[i] <= start:
+            start_index = i
+        if seconds[i] <= stop:
+            stop_index = i
+    return df.iloc[start_index:stop_index]
 
 
 def plot_extrema(df, column, margin=25, draw_line=True):
@@ -53,14 +67,19 @@ def main():
         print(chosen_file)
 
     df = pd.read_csv(chosen_file)
-    df.index = df[df.columns[0]]
+    # Converting time into seconds
+    ms = list(df[df.columns[0]])
+    df["Seconds"] = [(item - ms[0]) / 1000000 for item in ms]
+    df.index = df[df.columns[-1]]
     del df[df.columns[0]]
 
-    if "-t" in sys.argv:
+    if "-t" in sys.argv:  # trim time
         arg_pos = sys.argv.index("-t") + 1
         range = sys.argv[arg_pos]
         start, stop = tuple(range.split(":"))
         df = trim_data(df, int(start), int(stop))
+
+    del df[df.columns[-1]]
 
     # create the column choices
     command = "gum choose"
@@ -68,12 +87,57 @@ def main():
         command += f' "{col}"'
 
     y_choice = prompt(command)
-
+    # -- tried to get ylim to work here but the line kept disappearing
+    # y_lim = []
+    # if "-h" in sys.argv:  # crop height
+    #     arg_pos = sys.argv.index("-h") + 1
+    #     range = sys.argv[arg_pos]
+    #     y_lim = tuple(range.split(":"))
+    #     df.plot(y=y_choice, ylim=(start, stop), kind="line")
+    # else:
     df.plot(y=y_choice, kind="line")
+
     top, bottom = plot_extrema(df, y_choice, margin=120)
     print(top, bottom, top - bottom)
 
+    plt.title(make_title(chosen_file, y_choice))
+    plt.xlabel("Time (s)")
+    plt.ylabel(y_choice)
+
     plt.show()
 
+def make_title(chosen_file, y_choice):
+    """
+    Builds title and styles it correctly.
+    :param chosen_file: Str file name
+    :param y_choice: Str axis to be graphed
+    :return: Str graph title
+    """
+    path_split = chosen_file.split(os.sep)
+    trial_info = path_split[-1].split(".")
+    trial_info = [part for part in trial_info if part != ""]
+
+    motion = trial_info[0]
+    muscle = trial_info[1]
+
+    split_words = y_choice.lower().split()
+    axis = split_words[1]
+
+    motions = {"ChestAA": "Chest Abduction/Adduction",
+               "ShoulderFE": "Shoulder Flexion/Extension",
+               "ShoulderAA": "Shoulder Abduction/Adduction",
+               "BicepC": "Bicep Curl",
+               "FingerP": "Finger Pinch",
+               "BodyLean": "Body Lean"}
+
+    muscles = {"Bicep": "Bicep",
+               "Brachio": "Brachioradialis",
+               "Forearm": "Forearm"}
+
+    axises = {"x": "Vertical",
+              "y": "Horizontal",
+              "z": "Depth"}
+
+    return f"{motions[motion]}: {muscles[muscle]} {axises[axis]} Axis"
 
 main()
