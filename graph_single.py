@@ -57,6 +57,39 @@ def plot_extrema(df, column, margin=25, draw_line=True):
 
     return top_line, bot_line
 
+def make_title(chosen_file, y_choice):
+    """
+    Builds title and styles it correctly.
+    :param chosen_file: Str file name
+    :param y_choice: Str axis to be graphed
+    :return: Str graph title
+    """
+    path_split = chosen_file.split(os.sep)
+    trial_info = path_split[-1].split(".")
+    trial_info = [part for part in trial_info if part != ""]
+
+    motion = trial_info[0]
+    muscle = trial_info[1]
+
+    split_words = y_choice.lower().split()
+    axis = split_words[2]
+
+    motions = {"ChestAA": "Chest Abduction/Adduction",
+               "ShoulderFE": "Shoulder Flexion/Extension",
+               "ShoulderAA": "Shoulder Abduction/Adduction",
+               "BicepC": "Bicep Curl",
+               "FingerP": "Finger Pinch",
+               "BodyLean": "Body Lean"}
+
+    muscles = {"Bicep": "Bicep",
+               "Brachio": "Brachioradialis",
+               "Forearm": "Forearm"}
+
+    axises = {"x": "Vertical",
+              "y": "Horizontal",
+              "z": "Depth"}
+
+    return f"{motions[motion]}: {muscles[muscle]} {axises[axis]} Axis"
 
 def main():
     if "-f" in sys.argv:
@@ -108,39 +141,5 @@ def main():
     plt.ylabel(y_choice)
 
     plt.show()
-
-def make_title(chosen_file, y_choice):
-    """
-    Builds title and styles it correctly.
-    :param chosen_file: Str file name
-    :param y_choice: Str axis to be graphed
-    :return: Str graph title
-    """
-    path_split = chosen_file.split(os.sep)
-    trial_info = path_split[-1].split(".")
-    trial_info = [part for part in trial_info if part != ""]
-
-    motion = trial_info[0]
-    muscle = trial_info[1]
-
-    split_words = y_choice.lower().split()
-    axis = split_words[2]
-
-    motions = {"ChestAA": "Chest Abduction/Adduction",
-               "ShoulderFE": "Shoulder Flexion/Extension",
-               "ShoulderAA": "Shoulder Abduction/Adduction",
-               "BicepC": "Bicep Curl",
-               "FingerP": "Finger Pinch",
-               "BodyLean": "Body Lean"}
-
-    muscles = {"Bicep": "Bicep",
-               "Brachio": "Brachioradialis",
-               "Forearm": "Forearm"}
-
-    axises = {"x": "Vertical",
-              "y": "Horizontal",
-              "z": "Depth"}
-
-    return f"{motions[motion]}: {muscles[muscle]} {axises[axis]} Axis"
 
 main()
