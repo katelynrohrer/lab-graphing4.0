@@ -83,13 +83,21 @@ def make_title(chosen_file, y_choice):
 
     muscles = {"Bicep": "Bicep",
                "Brachio": "Brachioradialis",
-               "Forearm": "Forearm"}
+               "Forearm": "Forearm",
+               "Thumb": "Thumb"}
 
     axes = {"x": "Vertical",
               "y": "Horizontal",
               "z": "Depth"}
 
-    return f"{motions[motion]}: {muscles[muscle]} {axes[axis]} Axis"
+    if (motion in muscle):
+        motion = motions[motion]
+    if (muscle in muscles):
+        muscle = muscles[muscle]
+    if (axis in axes):
+        axis = axes[axis]
+
+    return f"{motion}: {muscle} {axis} Axis"
 
 def graph_single(filename):
 
