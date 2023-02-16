@@ -85,11 +85,11 @@ def make_title(chosen_file, y_choice):
                "Brachio": "Brachioradialis",
                "Forearm": "Forearm"}
 
-    axises = {"x": "Vertical",
+    axes = {"x": "Vertical",
               "y": "Horizontal",
               "z": "Depth"}
 
-    return f"{motions[motion]}: {muscles[muscle]} {axises[axis]} Axis"
+    return f"{motions[motion]}: {muscles[muscle]} {axes[axis]} Axis"
 
 def graph_single(filename):
 
