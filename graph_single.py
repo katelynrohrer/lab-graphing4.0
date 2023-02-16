@@ -68,8 +68,12 @@ def main():
 
     df = pd.read_csv(chosen_file)
     # Converting time into seconds
-    ms = list(df[df.columns[0]])
-    df["Seconds"] = [(item - ms[0]) / 1000000 for item in ms]
+    time = list(df[df.columns[0]])
+    if "moca" in chosen_file:
+        df["Seconds"] = [(item - time[0]) / 1000000 for item in time]
+    else:
+        df["Seconds"] = time
+
     df.index = df[df.columns[-1]]
     del df[df.columns[0]]
 
@@ -77,7 +81,7 @@ def main():
         arg_pos = sys.argv.index("-t") + 1
         range = sys.argv[arg_pos]
         start, stop = tuple(range.split(":"))
-        df = trim_data(df, int(start), int(stop))
+        df = trim_data(df, float(start), float(stop))
 
     del df[df.columns[-1]]
 
@@ -87,15 +91,14 @@ def main():
         command += f' "{col}"'
 
     y_choice = prompt(command)
-    # -- tried to get ylim to work here but the line kept disappearing
-    # y_lim = []
-    # if "-h" in sys.argv:  # crop height
-    #     arg_pos = sys.argv.index("-h") + 1
-    #     range = sys.argv[arg_pos]
-    #     y_lim = tuple(range.split(":"))
-    #     df.plot(y=y_choice, ylim=(start, stop), kind="line")
-    # else:
-    df.plot(y=y_choice, kind="line")
+
+    if "-h" in sys.argv:  # crop height
+        arg_pos = sys.argv.index("-h") + 1
+        range = sys.argv[arg_pos]
+        start, stop = tuple(range.split(":"))
+        df.plot(y=y_choice, ylim=(float(start), float(stop)), kind="line")
+    else:
+        df.plot(y=y_choice, kind="line")
 
     top, bottom = plot_extrema(df, y_choice, margin=120)
     print(top, bottom, top - bottom)
@@ -121,7 +124,7 @@ def make_title(chosen_file, y_choice):
     muscle = trial_info[1]
 
     split_words = y_choice.lower().split()
-    axis = split_words[1]
+    axis = split_words[2]
 
     motions = {"ChestAA": "Chest Abduction/Adduction",
                "ShoulderFE": "Shoulder Flexion/Extension",
