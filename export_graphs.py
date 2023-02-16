@@ -1,20 +1,21 @@
 
 import glob
 import os
-import graph_single
+from graph_single import *
 
 
 def main():
-
-    # find_files()
-    export("/Users/katierohrer/Desktop/MOCA/GitHub/All-Lab-Data/Lab/Experiment3_ShoulderAbduction/ES3F/Trial1_Slow/ShoulderAA.Forearm.ES3F.Run1.Biostamp.7_27_22.Slow.angularDisp.csv")
+    files = find_files()
+    for file in files:
+        graph_single(file)
+        export(file)
 
 def find_files(search_term=""):
     current_dir = os.getcwd()
     parent_dir = current_dir[:current_dir.rindex(os.sep)]
     csv_path = os.path.join(parent_dir, "All-Lab-Data", "Lab")
     files = glob.glob(csv_path + os.sep + "**" + os.sep + f"*{search_term}*angularDisp.csv", recursive=True)
-    print(files)
+    return files
 
 def export(chosen_file):
     csv_file_name = chosen_file[chosen_file.rindex(os.sep)+1:-4]
