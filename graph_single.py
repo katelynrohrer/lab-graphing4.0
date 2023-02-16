@@ -91,6 +91,28 @@ def make_title(chosen_file, y_choice):
 
     return f"{motions[motion]}: {muscles[muscle]} {axises[axis]} Axis"
 
+def graph_single(filename):
+
+    y_choice = "gyro disp y (deg)"
+
+    df = pd.read_csv(filename)
+    # Converting time into seconds
+    time = list(df[df.columns[0]])
+    if "moca" in filename:
+        df["Seconds"] = [(item - time[0]) / 1000000 for item in time]
+    else:
+        df["Seconds"] = time
+
+    df.index = df[df.columns[-1]]
+
+    # create the column choices
+    df.plot(y=y_choice, kind="line")
+
+    plt.title(make_title(filename, y_choice))
+    plt.xlabel("Time (s)")
+    plt.ylabel(y_choice)
+
+
 def main():
     if "-f" in sys.argv:
         arg_pos = sys.argv.index("-f") + 1
@@ -142,4 +164,5 @@ def main():
 
     plt.show()
 
-main()
+if __name__ == "__main__":
+    main()
