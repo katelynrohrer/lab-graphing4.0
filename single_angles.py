@@ -1,3 +1,4 @@
+import math
 import pandas as pd
 import os
 import sys
@@ -78,7 +79,7 @@ def columns_from_stamps(stamps, cols):
     
     :return: a tuple of the columns corresponding to the given stamps
     """
-    data = [None] * range(2*len(stamps))
+    data = [None] * 2*len(stamps)
     for col in cols:
         colwords = col.lower().split()
         for i in range(len(stamps)):
@@ -88,6 +89,38 @@ def columns_from_stamps(stamps, cols):
                 data[2*i + 1] = col
 
     return tuple(data)
+
+def calculate_angle(center_pt_x, center_pt_y, left_x, left_y, right_x, right_y):
+    """
+    Calculates the angle between three coordinate points.
+    :param center_pt_x: The x coordinate of the vertex.
+    :param center_pt_y: The y coordinate of the vertex.
+    :param left_x: The x coordinate of the leftmost side.
+    :param left_y: The y coordinate of the leftmost side.
+    :param right_x: The x coordinate of the rightmost side.
+    :param right_y: The y coordinate of the rightmost side.
+    :param cross: True if the lines cross so that a negative angle is found.
+    False if not.
+    :return: Returns the angle between the three points.
+    """
+
+    right_side = math.sqrt(((center_pt_x - right_x)**2) + ((center_pt_y - right_y)**2))
+    left_side = math.sqrt(((center_pt_x - left_x)**2) + ((center_pt_y - left_y)**2))
+    hypotenuse = math.sqrt(((left_x - right_x)**2) + ((left_y - right_y)**2))
+    angle = math.degrees(math.acos(((right_side**2) + (left_side**2) - (hypotenuse**2)) / (2*right_side * left_side)))
+
+    return angle
+
+def add_angles(df, columns):
+    df['angles'] = df.apply(lambda row: calculate_angle(row[columns[0]], 
+                                                        row[columns[1]], 
+                                                        row[columns[2]], 
+                                                        row[columns[3]],
+                                                        row[columns[4]],
+                                                        row[columns[5]]),
+                                                        axis=1)
+    df.plot(y='angles', kind='line')
+    plt.show()
 
 
 def main():
@@ -109,6 +142,8 @@ def main():
     print(stamps)
     print(df.columns)
     print(columns)
+    add_angles(df, columns)
+
 
 
 

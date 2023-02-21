@@ -55,9 +55,10 @@ def export(chosen_file, dest_dir):
     plt.savefig(save_path, bbox_inches='tight', pad_inches=0.5)
 
 
-def create_disp():
-
-    pass
+def integrate(df, new_column_name, axis, time, filepath):
+    df[new_column_name] = df[axis].diff() / df[time].diff()
+    df.to_csv(filepath, index=False)
+    
 
 def main():
     # the search directory might be different from the destination directory
@@ -65,6 +66,8 @@ def main():
     search_dir = "/Users/melancwaly/code/All-Lab-Data"
     destination_dir = "/Users/melancwaly/code/All-Lab-Data/all_images/angularVel"
     files = find_files(search_dir)
+
+
 
     for file in files:
         print(f"processing file: {file}")
