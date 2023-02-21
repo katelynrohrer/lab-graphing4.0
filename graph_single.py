@@ -101,7 +101,7 @@ def make_title(chosen_file, y_choice):
 
 def graph_single(filename):
 
-    y_choice = "gyro disp y (deg)"
+    y_choice = "gyro vel y (dps)"
 
     df = pd.read_csv(filename)
     # Converting time into seconds
@@ -119,6 +119,8 @@ def graph_single(filename):
     plt.title(make_title(filename, y_choice))
     plt.xlabel("Time (s)")
     plt.ylabel(y_choice)
+
+
 
 
 def main():

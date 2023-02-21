@@ -29,7 +29,7 @@ def find_files(search_dir, search_term=""):
     """
     csv_path = os.path.join(search_dir, "Lab")
     files = glob.glob(csv_path + os.sep + "**" + \
-            os.sep + f"*{search_term}*angularDisp.csv", recursive=True)
+            os.sep + f"*{search_term}*angularVel.csv", recursive=True)
     return files
 
 def export(chosen_file, dest_dir):
@@ -54,11 +54,16 @@ def export(chosen_file, dest_dir):
     save_path = os.path.join(dest_dir,  save_file_name)
     plt.savefig(save_path, bbox_inches='tight', pad_inches=0.5)
 
+
+def create_disp():
+
+    pass
+
 def main():
     # the search directory might be different from the destination directory
     # your search directry depends entirely on where 'All-Lab-Data' exists 
     search_dir = "/Users/melancwaly/code/All-Lab-Data"
-    destination_dir = "/Users/melancwaly/code/All-Lab-Data/all_images/angularDisp"
+    destination_dir = "/Users/melancwaly/code/All-Lab-Data/all_images/angularVel"
     files = find_files(search_dir)
 
     for file in files:
