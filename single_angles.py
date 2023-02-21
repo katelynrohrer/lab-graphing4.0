@@ -111,7 +111,18 @@ def calculate_angle(center_pt_x, center_pt_y, left_x, left_y, right_x, right_y):
 
     return angle
 
+
 def add_angles(df, columns):
+    """
+    calculates the angles and adds them back to the csv
+    then plots them displays
+
+    doesn't necessarily export the graph at the moment
+
+    :param df: the dataframe containing the info
+    :param columsn: tuple containing the six columns to extract angles to do
+    :returns: None
+    """
     df['angles'] = df.apply(lambda row: calculate_angle(row[columns[0]], 
                                                         row[columns[1]], 
                                                         row[columns[2]], 
