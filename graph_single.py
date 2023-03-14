@@ -4,6 +4,8 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import argrelextrema
+from single_angles import *
+from manipulate_batch import *
 
 
 def prompt(command):

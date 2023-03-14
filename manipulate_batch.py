@@ -6,6 +6,7 @@
 import glob
 import os
 from graph_single import *
+import pandas as pd
 
 """
 File tings for katie
@@ -55,10 +56,33 @@ def export(chosen_file, dest_dir):
     plt.savefig(save_path, bbox_inches='tight', pad_inches=0.5)
 
 
-def integrate(df, new_column_name, axis, time, filepath):
+def derive(df, new_column_name, axis, time):
     df[new_column_name] = df[axis].diff() / df[time].diff()
-    df.to_csv(filepath, index=False)
     
+
+def add_integration(filename):
+
+    df = pd.read_csv(filename)
+
+    cols = []
+    for col in df.columns:
+        if " X " in col or " Y " in col:
+            cols.append(col)
+
+    # Converting time into seconds
+    time = list(df[df.columns[0]])
+    if "moca" in filename:
+        df["Seconds"] = [(item - time[0]) / 1000000 for item in time]
+    else:
+        df["Seconds"] = time
+
+    df.index = df[df.columns[-1]]
+    
+    for col in cols:
+        vel_name = col + " Vel"
+        derive(df, vel_name, col, "Seconds")
+
+    df.to_csv(filename, index=False)
 
 def main():
     # the search directory might be different from the destination directory
