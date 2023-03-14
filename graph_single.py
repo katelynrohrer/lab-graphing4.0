@@ -3,23 +3,38 @@ import os
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
+from pandas.io.sql import execute
 from scipy.signal import argrelextrema
 from single_angles import *
 from manipulate_batch import *
 from title import *
+from pprint import pprint
 
 def abbreviate(strings):
-    retlist = []
+    dict = {}
+    # strings = [s for s in strings if "#" not in s]
     for string in strings:
         abbrev = ""
         index = 1
-        for word in string.split():
+        words = string.split()
+        for word in words:
             abbrev += word[:index]
-        while abbrev in retlist:
-            index+=1
+        while abbrev in dict:
             abbrev = ""
+            index+=1
+            for word in words:
+                abbrev += word[:index]
 
-        retlist.append(abbrev)
+        dict[abbrev] = string
+
+    for abbrev in dict:
+        if len(abbrev) > 2:
+            exec(f'global {abbrev}\n{abbrev} = "{dict[abbrev]}"')
+
+    pprint(dict)
+    return dict
+
+    
 
 def prompt(command):
     """
@@ -127,6 +142,7 @@ def main():
     global title
     df = pd.read_csv(chosen_file)
     title = Title(chosen_file)
+    abbreviate(df.columns)
 
     if "MOCA" in chosen_file:
         start_time = df["Timestamp (microseconds)"][0]
