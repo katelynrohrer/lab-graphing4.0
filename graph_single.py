@@ -6,7 +6,20 @@ import numpy as np
 from scipy.signal import argrelextrema
 from single_angles import *
 from manipulate_batch import *
+from title import *
 
+def abbreviate(strings):
+    retlist = []
+    for string in strings:
+        abbrev = ""
+        index = 1
+        for word in string.split():
+            abbrev += word[:index]
+        while abbrev in retlist:
+            index+=1
+            abbrev = ""
+
+        retlist.append(abbrev)
 
 def prompt(command):
     """
@@ -24,7 +37,7 @@ def prompt(command):
     return retstring
 
 
-def trim_data(df, start, stop):
+def trim(start, stop):
     """
     Trims the x-axis in terms of seconds
     :param df: Dataframe containing a ["Seconds"] column
@@ -42,7 +55,7 @@ def trim_data(df, start, stop):
     return df.iloc[start_index:stop_index]
 
 
-def plot_extrema(df, column, margin=25, draw_line=True):
+def plot_extrema(column, margin=25, draw_line=True):
     ilocs_min = argrelextrema(df[column].values, np.less_equal, order=margin // 2)[0]
     ilocs_max = argrelextrema(df[column].values, np.greater_equal, order=margin)[0]
 
@@ -59,71 +72,49 @@ def plot_extrema(df, column, margin=25, draw_line=True):
 
     return top_line, bot_line
 
-def make_title(chosen_file, y_choice):
-    """
-    Builds title and styles it correctly.
-    :param chosen_file: Str file name
-    :param y_choice: Str axis to be graphed
-    :return: Str graph title
-    """
-    path_split = chosen_file.split(os.sep)
-    trial_info = path_split[-1].split(".")
-    trial_info = [part for part in trial_info if part != ""]
-
-    motion = trial_info[0]
-    muscle = trial_info[1]
-
-    split_words = y_choice.lower().split()
-    axis = split_words[2]
-
-    motions = {"ChestAA": "Chest Abduction/Adduction",
-               "ShoulderFE": "Shoulder Flexion/Extension",
-               "ShoulderAA": "Shoulder Abduction/Adduction",
-               "BicepC": "Bicep Curl",
-               "FingerP": "Finger Pinch",
-               "BodyLean": "Body Lean"}
-
-    muscles = {"Bicep": "Bicep",
-               "Brachio": "Brachioradialis",
-               "Forearm": "Forearm",
-               "Thumb": "Thumb"}
-
-    axes = {"x": "Vertical",
-              "y": "Horizontal",
-              "z": "Depth"}
-
-    if (motion in muscle):
-        motion = motions[motion]
-    if (muscle in muscles):
-        muscle = muscles[muscle]
-    if (axis in axes):
-        axis = axes[axis]
-
-    return f"{motion}: {muscle} {axis} Axis"
-
 def graph_single(filename):
 
     y_choice = "gyro vel y (dps)"
 
     df = pd.read_csv(filename)
+
     # Converting time into seconds
-    time = list(df[df.columns[0]])
-    if "moca" in filename:
-        df["Seconds"] = [(item - time[0]) / 1000000 for item in time]
+    if "MOCA" in filename:
+        start_time = df["Timestamp (microseconds)"][0]
+        df["Seconds"] = df["Timestamp (microseconds)"].apply(lambda x : x - start_time) 
+        df["Seconds"] = df["Seconds"].apply(lambda x : x / 1000000)
     else:
-        df["Seconds"] = time
-
-    df.index = df[df.columns[-1]]
-
-    # create the column choices
+        df["Seconds"] = df["Timestamp (microseconds)"].apply(lambda x : x / 1000000)
+    df = df.set_index("Seconds")
     df.plot(y=y_choice, kind="line")
 
-    plt.title(make_title(filename, y_choice))
+    plt.title(str(title))
     plt.xlabel("Time (s)")
     plt.ylabel(y_choice)
 
+def reset():
+    global df
+    df = pd.read_csv(title.filename())
+
+def write():
+    df.to_csv(title.filename())
+
+def graph(*axes, extrema=False):
+    axes_list = list(axes)
+
+    _, ax = plt.subplots()
+
+    for axis in axes_list:
+        if extrema: 
+            plot_extrema(axis)
+        df.plot(y=axis, kind="line", ax=ax)
+
+    plt.title(str(title))
+    plt.show()
 
 def main():
+    os.chdir("/Users/jordan/Documents/Work/All-Lab-Data")
+
     if "-f" in sys.argv:
         arg_pos = sys.argv.index("-f") + 1
         chosen_file = sys.argv[arg_pos]
@@ -131,45 +122,48 @@ def main():
         chosen_file = prompt("gum file")
         print(chosen_file)
 
+    global df
+    global title
     df = pd.read_csv(chosen_file)
+    title = Title(chosen_file)
 
     if "MOCA" in chosen_file:
         start_time = df["Timestamp (microseconds)"][0]
-        df["Timestamp (microseconds)"].apply(lambda x : x - start_time) 
-    
-    df["Seconds"] = df["Timestamp (microseconds)"].apply(lambda x : x / 1000000)
+        df["Seconds"] = df["Timestamp (microseconds)"].apply(lambda x : x - start_time) 
+        df["Seconds"] = df["Seconds"].apply(lambda x : x / 1000000)
+    else:
+        df["Seconds"] = df["Timestamp (microseconds)"].apply(lambda x : x / 1000000)
     df = df.set_index("Seconds")
 
     if "-t" in sys.argv:  # trim time
         arg_pos = sys.argv.index("-t") + 1
         range = sys.argv[arg_pos]
         start, stop = tuple(range.split(":"))
-        df = trim_data(df, float(start), float(stop))
+        trim(float(start), float(stop))
 
+    # # create the column choices
+    # command = "gum choose"
+    # for col in df.columns:
+    #     command += f' "{col}"'
+    #
+    # y_choice = prompt(command)
+    #
+    # if "-h" in sys.argv:  # crop height
+    #     arg_pos = sys.argv.index("-h") + 1
+    #     range = sys.argv[arg_pos]
+    #     start, stop = tuple(range.split(":"))
+    #     df.plot(y=y_choice, ylim=(float(start), float(stop)), kind="line")
+    # else:
+    #     df.plot(y=y_choice, kind="line")
 
-    # create the column choices
-    command = "gum choose"
-    for col in df.columns:
-        command += f' "{col}"'
-
-    y_choice = prompt(command)
-
-    if "-h" in sys.argv:  # crop height
-        arg_pos = sys.argv.index("-h") + 1
-        range = sys.argv[arg_pos]
-        start, stop = tuple(range.split(":"))
-        df.plot(y=y_choice, ylim=(float(start), float(stop)), kind="line")
-    else:
-        df.plot(y=y_choice, kind="line")
-
-    top, bottom = plot_extrema(df, y_choice, margin=120)
-    print(top, bottom, top - bottom)
-
-    plt.title(make_title(chosen_file, y_choice))
-    plt.xlabel("Time (s)")
-    plt.ylabel(y_choice)
-
-    plt.show()
+    # top, bottom = plot_extrema(df, y_choice, margin=120)
+    # print(top, bottom, top - bottom)
+    #
+    # plt.title(make_title(chosen_file, y_choice))
+    # plt.xlabel("Time (s)")
+    # plt.ylabel(y_choice)
+    #
+    # plt.show()
 
 if __name__ == "__main__":
     main()
