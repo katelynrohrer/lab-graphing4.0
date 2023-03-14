@@ -43,16 +43,9 @@ def trim(start, stop):
     :param df: Dataframe containing a ["Seconds"] column
     :param start: Start time int in seconds
     :param stop: Stop time int in seconds
-    :return: The time cropped dataframe
     """
-    seconds = list(df["Seconds"])  # wasn't sure how to index into df
-    start_index, stop_index = 0, len(seconds)-1
-    for i in range(len(seconds)):
-        if seconds[i] <= start:
-            start_index = i
-        if seconds[i] <= stop:
-            stop_index = i
-    return df.iloc[start_index:stop_index]
+    global df
+    df = df.loc[start:stop]
 
 
 def plot_extrema(column, margin=25, draw_line=True):
@@ -95,6 +88,14 @@ def graph_single(filename):
 def reset():
     global df
     df = pd.read_csv(title.filename())
+
+    if "MOCA" in title.filename():
+        start_time = df["Timestamp (microseconds)"][0]
+        df["Seconds"] = df["Timestamp (microseconds)"].apply(lambda x : x - start_time) 
+        df["Seconds"] = df["Seconds"].apply(lambda x : x / 1000000)
+    else:
+        df["Seconds"] = df["Timestamp (microseconds)"].apply(lambda x : x / 1000000)
+    df = df.set_index("Seconds")
 
 def write():
     df.to_csv(title.filename())
