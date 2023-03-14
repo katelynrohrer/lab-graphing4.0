@@ -123,8 +123,6 @@ def graph_single(filename):
     plt.ylabel(y_choice)
 
 
-
-
 def main():
     if "-f" in sys.argv:
         arg_pos = sys.argv.index("-f") + 1
@@ -134,15 +132,13 @@ def main():
         print(chosen_file)
 
     df = pd.read_csv(chosen_file)
-    # Converting time into seconds
-    time = list(df[df.columns[0]])
-    if "moca" in chosen_file:
-        df["Seconds"] = [(item - time[0]) / 1000000 for item in time]
-    else:
-        df["Seconds"] = time
 
-    df.index = df[df.columns[-1]]
-    del df[df.columns[0]]
+    if "MOCA" in chosen_file:
+        start_time = df["Timestamp (microseconds)"][0]
+        df["Timestamp (microseconds)"].apply(lambda x : x - start_time) 
+    
+    df["Seconds"] = df["Timestamp (microseconds)"].apply(lambda x : x / 1000000)
+    df = df.set_index("Seconds")
 
     if "-t" in sys.argv:  # trim time
         arg_pos = sys.argv.index("-t") + 1
@@ -150,7 +146,6 @@ def main():
         start, stop = tuple(range.split(":"))
         df = trim_data(df, float(start), float(stop))
 
-    del df[df.columns[-1]]
 
     # create the column choices
     command = "gum choose"

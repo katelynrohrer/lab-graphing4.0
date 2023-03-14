@@ -30,7 +30,7 @@ def find_files(search_dir, search_term=""):
     """
     csv_path = os.path.join(search_dir, "Lab")
     files = glob.glob(csv_path + os.sep + "**" + \
-            os.sep + f"*{search_term}*angularVel.csv", recursive=True)
+            os.sep + f"*{search_term}*Epoch.csv", recursive=True)
     return files
 
 def export(chosen_file, dest_dir):
@@ -60,26 +60,28 @@ def derive(df, new_column_name, axis, time):
     df[new_column_name] = df[axis].diff() / df[time].diff()
     
 
-def add_integration(filename):
+def add_integration(filename, suffix):
 
     df = pd.read_csv(filename)
 
     cols = []
     for col in df.columns:
-        if " X " in col or " Y " in col:
+        if (" X" in col or " Y" in col) and suffix not in col:
             cols.append(col)
 
     # Converting time into seconds
-    time = list(df[df.columns[0]])
-    if "moca" in filename:
-        df["Seconds"] = [(item - time[0]) / 1000000 for item in time]
-    else:
-        df["Seconds"] = time
+    if "MOCA" in filename:
+        start_time = df["Timestamp (microseconds)"][0]
 
-    df.index = df[df.columns[-1]]
+        print(df["Timestamp (microseconds)"])
+        df["Timestamp (microseconds)"] = df["Timestamp (microseconds)"].apply(lambda x : x - start_time) 
+        print(df["Timestamp (microseconds)"])
+    
+    df["Seconds"] = df["Timestamp (microseconds)"].apply(lambda x : x / 1000000)
+    df = df.set_index("Seconds") # last change as 3/13 @ 8:25 pm
     
     for col in cols:
-        vel_name = col + " Vel"
+        vel_name = f"{col} {suffix}"
         derive(df, vel_name, col, "Seconds")
 
     df.to_csv(filename, index=False)
@@ -91,12 +93,24 @@ def main():
     destination_dir = "/Users/melancwaly/code/All-Lab-Data/all_images/angularVel"
     files = find_files(search_dir)
 
-
+    print(files[0])
 
     for file in files:
         print(f"processing file: {file}")
-        graph_single(file)
-        export(file, destination_dir)
+        # graph_single(file)
+        add_integration(file, "vel")
+        
+        # export(file, destination_dir)
+
+def test_add_integration():
+    search_dir = "/Users/melancwaly/code/All-Lab-Data"
+    destination_dir = "/Users/melancwaly/code/All-Lab-Data/all_images/angularVel"
+    files = find_files(search_dir)
+
+
+    
+
+
 
 if __name__ == "__main__":
     main()
