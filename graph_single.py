@@ -3,6 +3,7 @@ import os
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
+import string
 from pandas.io.sql import execute
 from scipy.signal import argrelextrema
 from single_angles import *
@@ -10,14 +11,14 @@ from manipulate_batch import *
 from title import *
 from pprint import pprint
 
-def abbreviate(strings):
+def abbrev(strings):
     dict = {}
-    # strings = [s for s in strings if "#" not in s]
-    for string in strings:
+    for str in strings:
         abbrev = ""
         index = 1
-        words = string.split()
+        words = str.split()
         for word in words:
+            word = ''.join(filter(str.isalpha, word))
             abbrev += word[:index]
         while abbrev in dict:
             abbrev = ""
@@ -25,7 +26,7 @@ def abbreviate(strings):
             for word in words:
                 abbrev += word[:index]
 
-        dict[abbrev] = string
+        dict[abbrev] = str
 
     for abbrev in dict:
         if len(abbrev) > 2:
@@ -128,9 +129,34 @@ def graph(*axes, extrema=False):
     plt.title(str(title))
     plt.show()
 
+def choose():
+    # create the column choices
+    command = "gum choose"
+    for col in df.columns:
+        command += f' "{col}"'
+
+    return prompt(command)
+
+def add_seconds(df):
+    # if "MOCA" in title.filename():
+    start_time = df["Timestamp (microseconds)"][0]
+    df["Seconds"] = df["Timestamp (microseconds)"].apply(lambda x : x - start_time) 
+    df["Seconds"] = df["Seconds"].apply(lambda x : x / 1000000)
+    # else:
+    #     df["Seconds"] = df["Timestamp (microseconds)"].apply(lambda x : x / 1000000)
+
+def add_file(filename=""):
+    global df
+    if filename == "":
+        filename = prompt("gum file")
+    df2 = pd.read_csv(filename)
+    df = pd.concat([df,df2])
+
 def main():
     os.chdir("/Users/jordan/Documents/Work/All-Lab-Data")
+    plt.ion()
 
+    # Get file to operate on
     if "-f" in sys.argv:
         arg_pos = sys.argv.index("-f") + 1
         chosen_file = sys.argv[arg_pos]
@@ -138,18 +164,16 @@ def main():
         chosen_file = prompt("gum file")
         print(chosen_file)
 
+    # Load data from file
     global df
     global title
     df = pd.read_csv(chosen_file)
     title = Title(chosen_file)
-    abbreviate(df.columns)
+    abbrev(df.columns)
 
-    if "MOCA" in chosen_file:
-        start_time = df["Timestamp (microseconds)"][0]
-        df["Seconds"] = df["Timestamp (microseconds)"].apply(lambda x : x - start_time) 
-        df["Seconds"] = df["Seconds"].apply(lambda x : x / 1000000)
-    else:
-        df["Seconds"] = df["Timestamp (microseconds)"].apply(lambda x : x / 1000000)
+    if ("Seconds" not in df.columns):
+        add_seconds(df)
+
     df = df.set_index("Seconds")
 
     if "-t" in sys.argv:  # trim time
@@ -158,13 +182,6 @@ def main():
         start, stop = tuple(range.split(":"))
         trim(float(start), float(stop))
 
-    # # create the column choices
-    # command = "gum choose"
-    # for col in df.columns:
-    #     command += f' "{col}"'
-    #
-    # y_choice = prompt(command)
-    #
     # if "-h" in sys.argv:  # crop height
     #     arg_pos = sys.argv.index("-h") + 1
     #     range = sys.argv[arg_pos]
