@@ -13,6 +13,15 @@ from title import *
 from pprint import pprint
 
 def abbrev(strings):
+    """
+    Given a collection of strings, creates a list of unique abbreviations for 
+    each one. Creates global variables for these abbreviations, and prints 
+    out the mapping.
+
+    :param strings: collection of strings to abbreviate
+
+    :return: dictionary mapping abbreviations to their corresponding strings
+    """
     dict = {}
     for s in strings:
         abbrev = ""
@@ -154,6 +163,12 @@ def add_file(filename=""):
     df = pd.concat([df,df2])
 
 def get_config():
+    """
+    Attempts to load a settings.json file. If none exists, creates one and 
+    prompts user to enter preferences to store
+
+    :return: dictionary of config options
+    """
     CONFIG_FILE = 'settings.json'
 
     if os.path.exists(CONFIG_FILE):
@@ -170,10 +185,12 @@ def get_config():
     return config
 
 def main():
+    # load config and set directory
     config = get_config()
     DATA_DIR = config["data_folder"]
-
     os.chdir(DATA_DIR)
+
+    # put matplotlib in interactive mode
     plt.ion()
 
     # Get file to operate on
@@ -201,23 +218,6 @@ def main():
         range = sys.argv[arg_pos]
         start, stop = tuple(range.split(":"))
         trim(float(start), float(stop))
-
-    # if "-h" in sys.argv:  # crop height
-    #     arg_pos = sys.argv.index("-h") + 1
-    #     range = sys.argv[arg_pos]
-    #     start, stop = tuple(range.split(":"))
-    #     df.plot(y=y_choice, ylim=(float(start), float(stop)), kind="line")
-    # else:
-    #     df.plot(y=y_choice, kind="line")
-
-    # top, bottom = plot_extrema(df, y_choice, margin=120)
-    # print(top, bottom, top - bottom)
-    #
-    # plt.title(make_title(chosen_file, y_choice))
-    # plt.xlabel("Time (s)")
-    # plt.ylabel(y_choice)
-    #
-    # plt.show()
 
 if __name__ == "__main__":
     main()
