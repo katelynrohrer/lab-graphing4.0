@@ -134,4 +134,4 @@ dmypy.json
 Trial1_Fast
 __pycache__
 .DS_Store
-
+*.json

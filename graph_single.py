@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import json
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
@@ -13,10 +14,10 @@ from pprint import pprint
 
 def abbrev(strings):
     dict = {}
-    for str in strings:
+    for s in strings:
         abbrev = ""
         index = 1
-        words = str.split()
+        words = s.split()
         for word in words:
             word = ''.join(filter(str.isalpha, word))
             abbrev += word[:index]
@@ -26,7 +27,7 @@ def abbrev(strings):
             for word in words:
                 abbrev += word[:index]
 
-        dict[abbrev] = str
+        dict[abbrev] = s
 
     for abbrev in dict:
         if len(abbrev) > 2:
@@ -152,8 +153,27 @@ def add_file(filename=""):
     df2 = pd.read_csv(filename)
     df = pd.concat([df,df2])
 
+def get_config():
+    CONFIG_FILE = 'settings.json'
+
+    if os.path.exists(CONFIG_FILE):
+        with open(CONFIG_FILE, 'r') as f:
+            config = json.load(f)
+    else:
+        folder_name = input("Enter data folder path: ")
+        
+        config = {"data_folder": folder_name}
+        
+        with open(CONFIG_FILE, 'w') as f:
+            json.dump(config, f)
+
+    return config
+
 def main():
-    os.chdir("/Users/jordan/Documents/Work/All-Lab-Data")
+    config = get_config()
+    DATA_DIR = config["data_folder"]
+
+    os.chdir(DATA_DIR)
     plt.ion()
 
     # Get file to operate on
