@@ -10,24 +10,17 @@ from datafile import DataFile
 from utils import *
 from pprint import pprint
 
-def matches_pat(terms, name):
-    name = name.lower()
-    for term in terms:
-        term = term.lower()
-        if term not in name:
-            return False
-    return True
-
 def search(*terms, csv_only=True):
     terms = list(terms)
     if csv_only:
         terms.append(".csv")
-    terms = map(str.lower, terms)
+    terms = list(map(str.lower, terms))
 
-    match_fun = lambda x: False not in [term in x.lower() for term in terms]
+    # Returns True if all terms are in x
+    def match_fun(x): 
+        return False not in [term in x.lower() for term in terms]
 
     files = glob("./**", recursive=True)
-    # cur_match = lambda x: matches_pat(terms, x)
     files = filter(match_fun, files)
 
     return list(files)
