@@ -1,4 +1,22 @@
 import os
+import numpy as np
+
+def find_offset(a, v):
+    max_corr = -np.inf
+    best_offset = 0
+
+    # Loop over possible offsets between a and v
+    for offset in range(len(a)):
+        shifted_v = v[offset:] + v[:offset]  # shift v by the offset
+        corr = np.corrcoef(a, shifted_v)[0, 1]  # compute correlation between a and shifted v
+        
+        if corr > max_corr:  # update max_corr and best_offset if corr is larger
+            max_corr = corr
+            best_offset = offset
+
+    print("Best offset:", best_offset)
+    print("Max correlation:", max_corr)
+
 
 def abbrev(strings):
     """

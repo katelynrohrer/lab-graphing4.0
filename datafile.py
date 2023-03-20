@@ -12,25 +12,25 @@ class DataFile:
         self.info = Title(filename)
 
         self.df = pd.read_csv(filename)
-        if "Seconds" not in self.df.columns:
-            self.add_seconds()
-        self.df = self.df.set_index("Seconds")
         self.columns = self.df.columns
+        # self.df = self.df.set_index("Seconds")
 
 
     def add_seconds(self):
         df = self.df
-        start_time = df["Timestamp (microseconds)"][0]
-        df["Seconds"] = df["Timestamp (microseconds)"].apply(lambda x : x - start_time) 
-        df["Seconds"] = df["Seconds"].apply(lambda x : x / 1000000)
+        if "Seconds" not in df.columns:
+            start_time = df["Timestamp (microseconds)"][0]
+            df["Seconds"] = df["Timestamp (microseconds)"].apply(lambda x : x - start_time) 
+            df["Seconds"] = df["Seconds"].apply(lambda x : x / 1000000)
+
+        self.df = self.df.set_index("Seconds")
 
     def graph(self, *axes, extrema=False):
         df = self.df
-        axes_list = list(axes)
 
         _, ax = plt.subplots()
 
-        for axis in axes_list:
+        for axis in axes:
             if extrema: 
                 self.plot_extrema(axis)
             df.plot(y=axis, kind="line", ax=ax)
@@ -42,14 +42,9 @@ class DataFile:
         self.df.to_csv(self.filename)
 
     def reset(self):
-        df = self.df
-        df = pd.read_csv(self.filename)
-
-        if "Seconds" not in df.columns:
-            self.add_seconds()
-
-        self.df = df.set_index("Seconds")
+        self.df = pd.read_csv(self.filename)
         self.columns = self.df.columns
+        # self.df = df.set_index("Seconds")
 
     def choose_col(self):
         command = "gum choose"
@@ -87,7 +82,7 @@ class DataFile:
         return top_line, bot_line
     
     def __str__(self):
-        return str(self.df)
+        return f"DataFile: {self.info}"
 
     def __getitem__(self, item):
         return self.df[item]
