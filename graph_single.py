@@ -32,27 +32,6 @@ def apply(dfs, methodToRun, *args):
     for df in dfs:
         methodToRun(df, *args)
 
-def graph_single(filename):
-
-    y_choice = "gyro vel y (dps)"
-
-    df = pd.read_csv(filename)
-
-    # Converting time into seconds
-    if "MOCA" in filename:
-        start_time = df["Timestamp (microseconds)"][0]
-        df["Seconds"] = df["Timestamp (microseconds)"].apply(lambda x : x - start_time) 
-        df["Seconds"] = df["Seconds"].apply(lambda x : x / 1000000)
-    else:
-        df["Seconds"] = df["Timestamp (microseconds)"].apply(lambda x : x / 1000000)
-    df = df.set_index("Seconds")
-    df.plot(y=y_choice, kind="line")
-
-    plt.title(str(Title(filename)))
-    plt.xlabel("Time (s)")
-    plt.ylabel(y_choice)
-
-
 def newf(filename=""):
     if filename == "":
         filename = prompt("gum file")
