@@ -7,7 +7,7 @@ class Title:
         path_split = filename.split(os.sep)
         trial_info = path_split[-1].split(".")
         trial_info = [part.lower() for part in trial_info if part != "" and part != "csv"]
-
+        self.origin = ""
 
         # checking for moca vs biostamp data
         if "moca" in trial_info:
@@ -23,11 +23,11 @@ class Title:
 
         # correlating trial info with object attributes
         if self.origin == "moca":
-            self.motion, _, self.subject, self.run, _, self.date, self.speed, = trial_info
+            self.motion, _, self.subject, self.run, _, self.date, self.speed, = tuple(trial_info)
             self.measure = "disp"
             self.muscle = "undetermined"
         else:
-            self.motion, self.muscle, self.subject, self.run, _, self.date, self.speed, self.measure = trial_info
+            self.motion, self.muscle, self.subject, self.run, _, self.date, self.speed, self.measure = tuple(trial_info)
 
 
         # attempts to make motion and muscles strs "pretty"

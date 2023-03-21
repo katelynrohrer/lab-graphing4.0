@@ -29,27 +29,22 @@ class DataFile:
         if len(columns) == 4:
             start_pos_1 = self.df[columns[2]][0]
             start_pos_2 = self.df[columns[3]][0]
-            self.df['angles'] = self.df.apply(lambda row: calculate_angle(row[columns[0]], 
-                                                            row[columns[1]], 
-                                                            row[columns[2]], 
-                                                            row[columns[3]],
-                                                            start_pos_1,
-                                                            start_pos_2),
-                                                            axis=1)
+            self.df['angles'] = self.df.apply(lambda row: calculate_angle(
+                row[columns[0]], row[columns[1]], row[columns[2]], row[columns[3]],
+                start_pos_1, start_pos_2), axis=1)
+
         elif len(columns) == 6:
-            self.df['angles'] = self.df.apply(lambda row: calculate_angle(row[columns[0]], 
-                                                            row[columns[1]], 
-                                                            row[columns[2]], 
-                                                            row[columns[3]],
-                                                            row[columns[4]],
-                                                            row[columns[5]]),
-                                                            axis=1)
+            self.df['angles'] = self.df.apply(lambda row: calculate_angle(
+                row[columns[0]], row[columns[1]], row[columns[2]], row[columns[3]],
+                row[columns[4]], row[columns[5]]), axis=1)
 
 
 
     def add_seconds(self):
         df = self.df
-        if "Seconds" not in df.columns:
+        if "time (s)" in map(str.tolower, df.columns):
+            df["Seconds"] = df["Time (s)"]
+        elif "Seconds" not in df.columns:
             start_time = df["Timestamp (microseconds)"][0]
             df["Seconds"] = df["Timestamp (microseconds)"].apply(lambda x : x - start_time) 
             df["Seconds"] = df["Seconds"].apply(lambda x : x / 1000000)

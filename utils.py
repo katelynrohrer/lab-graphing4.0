@@ -1,6 +1,24 @@
 import os
 import numpy as np
 
+def filter_for_terms(strs, *terms):
+    """
+    Filters the given list of strings based on the terms given.
+    Is case-insensitive
+
+    :return: a list of any strings that match all terms
+    """
+
+    terms = [t.lower() for t in terms]
+    def match_fun(x): 
+        x = x.lower()
+        for term in terms:
+            if term not in x:
+                return False
+        return True
+
+    return list(filter(match_fun, strs))
+
 def find_offset(a, v):
     max_corr = -np.inf
     best_offset = 0

@@ -7,35 +7,14 @@ import matplotlib.pyplot as plt
 from glob import glob
 from title import Title 
 from datafile import DataFile
+from search import Search
 from utils import *
 from pprint import pprint
-
-def search(*terms, csv_only=True):
-    terms = list(terms)
-    if csv_only:
-        terms.append(".csv")
-    terms = list(map(str.lower, terms))
-
-    # Returns True if all terms are in x
-    def match_fun(x): 
-        return False not in [term in x.lower() for term in terms]
-
-    files = glob("./**", recursive=True)
-    files = filter(match_fun, files)
-
-    return [DataFile(f) for f in files]
-
-    
-def apply(dfs, methodToRun, *args):
-    for df in dfs:
-        methodToRun(df, *args)
-        print(f"Applied {methodToRun.__name__} on {df}")
 
 def newf(filename=""):
     if filename == "":
         filename = prompt("gum file")
     return DataFile(filename)
-
 
 def get_config():
     """
