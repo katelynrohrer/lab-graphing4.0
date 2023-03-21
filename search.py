@@ -38,3 +38,7 @@ class Search:
 
     def r(self, verbose=False):
         self.a(DataFile.reset, verbose=verbose)
+
+    def pprint(self):
+        for item in self.data:
+            print(item)

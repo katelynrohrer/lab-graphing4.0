@@ -108,7 +108,7 @@ class DataFile:
         return top_line, bot_line
     
     def __str__(self):
-        return f"DataFile: {self.info}"
+        return f"DataFile: \n{self.info}"
 
     def __getitem__(self, item):
         return self.df[item]
