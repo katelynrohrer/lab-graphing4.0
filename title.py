@@ -82,6 +82,24 @@ class Title:
         Builds a representation of all of the file information.
         :return: Info string
         """
+        return f"Origin: {self.origin:^8} | " \
+               f"Motion: {self.motion:^2} | " \
+               f"Muscle: {self.muscle:^15} | " \
+               f"Subject: {self.subject:^5} | " \
+               f"Run: {self.run:^4} | " \
+               f"Speed: {self.speed:^4} | " \
+               f"Date: {self.date:^7} | " \
+               f"Measure: {self.measure:^11} | " \
+               f"Epoch: {str(self.epoch):^5s} |"
+
+    def pprint(self):
+        """
+        Builds a representation of all of the file information.
+        *but* in a form that fits all within 80 characters, per
+        each of the three lines
+
+        :return: Info string 
+        """
         return f"\t| Origin: {self.origin:^8} | " \
                f"Motion: {self.motion:^2} | " \
                f"\n\t| Muscle: {self.muscle:^15} | " \
