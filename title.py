@@ -77,7 +77,19 @@ class Title:
                f"{self.run[0:3].capitalize()} {self.run[3]} " \
                f"{self.speed.capitalize()} "
 
+
     def __str__(self):
+        """
+        Builds a representation of all of the file information.
+        :return: Info string
+        """
+        return f"Motion: {self.motion:^2} | " \
+               f"Muscle: {self.muscle:^15} | " \
+               f"Subject: {self.subject:^5} | " \
+              
+
+
+    def __repr__(self):
         """
         Builds a representation of all of the file information.
         :return: Info string
@@ -91,6 +103,7 @@ class Title:
                f"Date: {self.date:^7} | " \
                f"Measure: {self.measure:^11} | " \
                f"Epoch: {str(self.epoch):^5s} |"
+
 
     def pprint(self):
         """
