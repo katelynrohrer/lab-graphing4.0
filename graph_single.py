@@ -23,14 +23,13 @@ def search(*terms, csv_only=True):
     files = glob("./**", recursive=True)
     files = filter(match_fun, files)
 
-    return list(files)
+    return [DataFile(f) for f in files]
 
-def make_dfs(filenames):
-    return [DataFile(f) for f in filenames]
     
 def apply(dfs, methodToRun, *args):
     for df in dfs:
         methodToRun(df, *args)
+        print(f"Applied {methodToRun.__name__} on {df}")
 
 def newf(filename=""):
     if filename == "":
@@ -63,8 +62,8 @@ def get_config():
 def abbrevs(*dfs):
     global abbrevs
     cols = []
-    for df in dfs:
-        cols += list(df.columns)
+    for file in dfs:
+        cols += list(file.df.columns)
     abbrevs = abbrev(cols)
     pprint(abbrevs)
     for key in abbrevs:

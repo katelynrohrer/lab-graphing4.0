@@ -4,16 +4,48 @@ import numpy as np
 from scipy.signal import argrelextrema
 from utils import prompt
 from title import *
+from single_angles import *
 
 
 class DataFile:
     def __init__(self, filename):
         self.filename = filename
         self.info = Title(filename)
-
         self.df = pd.read_csv(filename)
-        self.columns = self.df.columns
+
         # self.df = self.df.set_index("Seconds")
+    def del_unnamed(self):
+        self.df.drop("Unnamed: 0", axis=1, inplace=True)
+
+    def add_angles(self):
+        stamps = stamps_from_motion(self.info.motion)
+        columns = columns_from_stamps(stamps, self.df.columns)
+        print(f"{self.filename} | {stamps} | {columns}")
+        
+        for col in columns:
+            if col not in self.df.columns:
+                print(f"ERROR | File did not have column {col}")
+                return
+
+        if len(columns) == 4:
+            start_pos_1 = self.df[columns[2]][0]
+            start_pos_2 = self.df[columns[3]][0]
+            self.df['angles'] = self.df.apply(lambda row: calculate_angle(row[columns[0]], 
+                                                            row[columns[1]], 
+                                                            row[columns[2]], 
+                                                            row[columns[3]],
+                                                            start_pos_1,
+                                                            start_pos_2),
+                                                            axis=1)
+        elif len(columns) == 6:
+            self.df['angles'] = self.df.apply(lambda row: calculate_angle(row[columns[0]], 
+                                                            row[columns[1]], 
+                                                            row[columns[2]], 
+                                                            row[columns[3]],
+                                                            row[columns[4]],
+                                                            row[columns[5]]),
+                                                            axis=1)
+
 
 
     def add_seconds(self):
@@ -23,7 +55,7 @@ class DataFile:
             df["Seconds"] = df["Timestamp (microseconds)"].apply(lambda x : x - start_time) 
             df["Seconds"] = df["Seconds"].apply(lambda x : x / 1000000)
 
-        self.df = self.df.set_index("Seconds")
+        self.df.set_index("Seconds", inplace=True)
 
     def graph(self, *axes, extrema=False):
         df = self.df
@@ -39,11 +71,11 @@ class DataFile:
         plt.show()
 
     def write(self):
-        self.df.to_csv(self.filename)
+        self.df.to_csv(self.filename, index=False)
 
     def reset(self):
         self.df = pd.read_csv(self.filename)
-        self.columns = self.df.columns
+
         # self.df = df.set_index("Seconds")
 
     def choose_col(self):

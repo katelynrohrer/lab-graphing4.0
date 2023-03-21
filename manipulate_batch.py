@@ -108,9 +108,5 @@ def test_add_integration():
     files = find_files(search_dir)
 
 
-    
-
-
-
 if __name__ == "__main__":
     main()

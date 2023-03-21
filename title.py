@@ -23,8 +23,8 @@ class Title:
                    "Forearm": "Forearm",
                    "Thumb": "Thumb"}
 
-        if (self.motion in motions):
-            self.motion = motions[self.motion]
+        # if (self.motion in motions):
+        #     self.motion = motions[self.motion]
         if (self.muscle in muscles):
             self.muscle = muscles[self.muscle]
 
