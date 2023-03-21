@@ -4,7 +4,7 @@ import numpy as np
 from scipy.signal import argrelextrema
 from utils import prompt
 from title import *
-from single_angles import *
+from angle_utils import *
 
 
 class DataFile:
@@ -20,8 +20,7 @@ class DataFile:
     def add_angles(self):
         stamps = stamps_from_motion(self.info.motion)
         columns = columns_from_stamps(stamps, self.df.columns)
-        print(f"{self.filename} | {stamps} | {columns}")
-        
+
         for col in columns:
             if col not in self.df.columns:
                 print(f"ERROR | File did not have column {col}")
