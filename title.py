@@ -29,11 +29,6 @@ class Title:
         else:
             self.motion, self.muscle, self.subject, self.run, _, self.date, self.speed, self.measure = trial_info
 
-<<<<<<< Updated upstream
-        # if (self.motion in motions):
-        #     self.motion = motions[self.motion]
-        if (self.muscle in muscles):
-=======
 
         # attempts to make motion and muscles strs "pretty"
         motions = {"chestaa": "Chest Abduction/Adduction",
@@ -60,7 +55,6 @@ class Title:
         if self.motion in motions:
             self.motion = motions[self.motion]
         if self.muscle in muscles:
->>>>>>> Stashed changes
             self.muscle = muscles[self.muscle]
         if self.origin in origins:
             self.origin = origins[self.origin]
