@@ -39,6 +39,8 @@ class Search:
     def r(self, verbose=False):
         self.a(DataFile.reset, verbose=verbose)
 
-    def pprint(self):
+    # print data
+    def pd(self):
+        print(f"{len(self.data)} DataFile(s) loaded:")
         for item in self.data:
             print(item)
