@@ -38,11 +38,90 @@ class DataFile:
                 row[columns[0]], row[columns[1]], row[columns[2]], row[columns[3]],
                 row[columns[4]], row[columns[5]]), axis=1)
 
+    def px_to_m(self):
+        """
+        Finds conversion factor for pixels to meters and adds columns
+        to the dataset for the meter scaled values.
+        """
+        # hard coded arm lengths
+        lens = {
+            ("gsp1m", "Chest Abduction/Adduction"): 0.3,
+            ("gsp1m", "Shoulder Flexion/Extension"): 0.3,
+            ("gsp1m", "Shoulder Abduction/Adduction"): 0.26,
+            ("gsp1m", "Bicep Curl"): 0.265,
+            ("gsp1m", "Finger Pinch"): 0.09,
+            ("gsp1m", "Body Lean"): 0.19,
 
+            ("ch2m", "Chest Abduction/Adduction"): 0.3,
+            ("ch2m", "Shoulder Flexion/Extension"): 0.345,
+            ("ch2m", "Shoulder Abduction/Adduction"): 0.28,
+            ("ch2m", "Bicep Curl"): 0.315,
+            ("ch2m", "Finger Pinch"): 0.095,
+            ("ch2m", "Body Lean"): 0.25,
 
+            ("ya3m", "Chest Abduction/Adduction"): 0.3,
+            ("ya3m", "Shoulder Flexion/Extension"): 0.3,
+            ("ya3m", "Shoulder Abduction/Adduction"): 0.3,
+            ("ya3m", "Bicep Curl"): 0.34,
+            ("ya3m", "Finger Pinch"): 0.095,
+            ("ya3m", "Body Lean"): 0.25,
+
+            ("cg1f", "Chest Abduction/Adduction"): 0.28,
+            ("cg1f", "Shoulder Flexion/Extension"): 0.28,
+            ("cg1f", "Shoulder Abduction/Adduction"): 0.23,
+            ("cg1f", "Bicep Curl"): 0.27,
+            ("cg1f", "Finger Pinch"): 0.09,
+            ("cg1f", "Body Lean"): 0.27,
+
+            ("es3f", "Chest Abduction/Adduction"): 0.275,
+            ("es3f", "Shoulder Flexion/Extension"): 0.25,
+            ("es3f", "Shoulder Abduction/Adduction"): 0.245,
+            ("es3f", "Bicep Curl"): 0.26,
+            ("es3f", "Finger Pinch"): 0.08,
+            ("es3f", "Body Lean"): 0.275
+        }
+
+        e_to_h_motions = ["Chest Abduction/Adduction", "Shoulder Flexion/Extension", "Shoulder Abduction/Adduction", "Bicep Curl"]
+        if self.info.motion in e_to_h_motions:
+            fst_x_col = [col for col in self.df.columns if 'elbow' in col.lower() and ' x' in col.lower()]
+            fst_y_col = [col for col in self.df.columns if 'elbow' in col.lower() and ' y' in col.lower()]
+            snd_x_col = [col for col in self.df.columns if 'hand' in col.lower() and ' x' in col.lower()]
+            snd_y_col = [col for col in self.df.columns if 'hand' in col.lower() and ' y' in col.lower()]
+        elif self.info.motion == "Finger Pinch":
+            fst_x_col = [col for col in self.df.columns if 'index' in col.lower() and ' x' in col.lower()]
+            fst_y_col = [col for col in self.df.columns if 'index' in col.lower() and ' y' in col.lower()]
+            snd_x_col = [col for col in self.df.columns if 'thumb' in col.lower() and ' x' in col.lower()]
+            snd_y_col = [col for col in self.df.columns if 'thumb' in col.lower() and ' y' in col.lower()]
+        else:  # else body lean
+            fst_x_col = [col for col in self.df.columns if 'back' in col.lower() and ' x' in col.lower()]
+            fst_y_col = [col for col in self.df.columns if 'back' in col.lower() and ' y' in col.lower()]
+            snd_x_col = [col for col in self.df.columns if 'neck' in col.lower() and ' x' in col.lower()]
+            snd_y_col = [col for col in self.df.columns if 'neck' in col.lower() and ' y' in col.lower()]
+
+        side1 = float(self.df[fst_y_col].iloc[0]) - float(self.df[snd_y_col].iloc[0])
+        side2 = float(self.df[fst_x_col].iloc[0]) - float(self.df[snd_x_col].iloc[0])
+
+        try:
+            limb_len_m = lens[(self.info.subject, self.info.motion)]
+        except KeyError:
+            print("Length not found.")
+            return
+
+        limb_len_px = math.sqrt((side1 ** 2) + (side2 ** 2))
+        scale = limb_len_m / limb_len_px
+        print(scale)
+
+        x_cols = [col for col in self.df.columns if 'x' in col.lower()]
+        y_cols = [col for col in self.df.columns if 'y' in col.lower()]
+
+        for col in x_cols:
+            self.df.loc[:, f"{col} meters"] = self.df[col] * scale
+        for col in y_cols:
+            self.df.loc[:, f"{col} meters"] = self.df[col] * scale
+            
     def add_seconds(self):
         df = self.df
-        if "time (s)" in map(str.tolower, df.columns):
+        if "time (s)" in map(str.lower, df.columns):
             df["Seconds"] = df["Time (s)"]
         elif "Seconds" not in df.columns:
             start_time = df["Timestamp (microseconds)"][0]
