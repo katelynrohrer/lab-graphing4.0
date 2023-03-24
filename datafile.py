@@ -12,6 +12,7 @@ class DataFile:
         self.filename = filename
         self.info = Title(filename)
         self.df = pd.read_csv(filename)
+        self.add_seconds()
 
         # self.df = self.df.set_index("Seconds")
     def del_unnamed(self):
@@ -37,6 +38,23 @@ class DataFile:
             self.df['angles'] = self.df.apply(lambda row: calculate_angle(
                 row[columns[0]], row[columns[1]], row[columns[2]], row[columns[3]],
                 row[columns[4]], row[columns[5]]), axis=1)
+
+    def offset_zero(self, col):
+        df = self.df
+        start = df[col][0]
+        df[col] = df[col].apply(lambda x : x - start) 
+
+    def offset(self, amt):
+        self.df.set_index("Seconds",inplace=True)
+        self.trim(amt, 10000000)
+        self.df.reset_index(inplace=True)
+        self.offset_zero("Seconds")
+
+    def resample(self):
+        self.df.index = pd.to_datetime(self.df["Seconds"],unit="s")
+        self.df = self.df.resample("100000U").mean()
+        self.df = self.df.interpolate(method='linear')
+        self.df.reset_index(drop=True,inplace=True)
 
     def px_to_m(self):
         """
@@ -118,30 +136,34 @@ class DataFile:
             self.df.loc[:, f"{col} meters"] = self.df[col] * scale
         for col in y_cols:
             self.df.loc[:, f"{col} meters"] = self.df[col] * scale
-            
+
     def add_seconds(self):
         df = self.df
         if "time (s)" in map(str.lower, df.columns):
-            df["Seconds"] = df["Time (s)"]
-        elif "Seconds" not in df.columns:
+            df["Seconds"] = df["time (s)"]
+            # df.drop("time (s)")
+        elif "Timestamp (microseconds)" in df.columns:
             start_time = df["Timestamp (microseconds)"][0]
-            df["Seconds"] = df["Timestamp (microseconds)"].apply(lambda x : x - start_time) 
-            df["Seconds"] = df["Seconds"].apply(lambda x : x / 1000000)
+            df["Seconds"] = df["Timestamp (microseconds)"].apply(
+                lambda x: x - start_time)
+            df["Seconds"] = df["Seconds"].apply(lambda x: x / 1000000)
 
-        self.df.set_index("Seconds", inplace=True)
 
-    def graph(self, *axes, extrema=False):
+    def graph(self, *axes, ax=None, extrema=False):
         df = self.df
 
-        _, ax = plt.subplots()
+        if ax is None:
+            _, ax = plt.subplots()
 
         for axis in axes:
             if extrema: 
                 self.plot_extrema(axis)
-            df.plot(y=axis, kind="line", ax=ax)
+            df.plot(x="Seconds",y=axis, kind="line", ax=ax)
 
         plt.title(str(self.info))
         plt.show()
+
+        return ax
 
     def write(self):
         self.df.to_csv(self.filename, index=False)
