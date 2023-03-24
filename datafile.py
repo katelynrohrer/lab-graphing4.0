@@ -139,9 +139,11 @@ class DataFile:
 
     def add_seconds(self):
         df = self.df
-        if "time (s)" in map(str.lower, df.columns):
+        if "Seconds" in df.columns:
+            return
+        if "time (s)" in df.columns:
             df["Seconds"] = df["time (s)"]
-            # df.drop("time (s)")
+            df.drop("time (s)", axis=1, inplace=True)
         elif "Timestamp (microseconds)" in df.columns:
             start_time = df["Timestamp (microseconds)"][0]
             df["Seconds"] = df["Timestamp (microseconds)"].apply(
