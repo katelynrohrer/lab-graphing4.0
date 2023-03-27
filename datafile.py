@@ -14,7 +14,6 @@ class DataFile:
         self.df = pd.read_csv(filename)
         self.add_seconds()
 
-        # self.df = self.df.set_index("Seconds")
     def del_unnamed(self):
         self.df.drop("Unnamed: 0", axis=1, inplace=True)
 
@@ -50,9 +49,9 @@ class DataFile:
         self.df.reset_index(inplace=True)
         self.offset_zero("Seconds")
 
-    def resample(self):
+    def resample(self, sr="10000U"):
         self.df.index = pd.to_datetime(self.df["Seconds"],unit="s")
-        self.df = self.df.resample("100000U").mean()
+        self.df = self.df.resample(sr).mean()
         self.df = self.df.interpolate(method='linear')
         self.df.reset_index(drop=True,inplace=True)
 

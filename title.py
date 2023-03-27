@@ -59,6 +59,25 @@ class Title:
         if self.origin in origins:
             self.origin = origins[self.origin]
 
+    def prettify(self,str):
+        names = {"chestaa": "Chest Abduction/Adduction",
+                   "shoulderfe": "Shoulder Flexion/Extension",
+                   "shoulderaa": "Shoulder Abduction/Adduction",
+                   "bicepc": "Bicep Curl",
+                   "fingerp": "Finger Pinch",
+                   "bodylean": "Body Lean",
+                   "brachio": "Brachioradialis",
+                   "cspine": "Cervical Spine",
+                   "femor": "Biceps Femoris",
+                   "midspine": "Mid-Thoracic Spine",
+                   "deltoid": "Medial Deltoid",
+                   "moca": "MOCA"
+                 }
+        if str in names:
+            return names[str]
+        else:
+            return str.title()
+
     def title_str(self):
         """
         Builds title string for the graphs
@@ -104,6 +123,8 @@ class Title:
                f"Measure: {self.measure:^11} | " \
                f"Epoch: {str(self.epoch):^5s} |"
 
+    def csv_string(self):
+        return f"{self.motion},{self.subject},{self.run},{self.speed}"
 
     def pprint(self):
         """

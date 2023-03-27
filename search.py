@@ -1,8 +1,7 @@
 from datafile import DataFile
 from glob import glob
 from utils import *
-import time
-import progressbar
+from progressbar import progressbar
 
 class Search:
     def __init__(self, *terms, csv_only=True):
@@ -15,7 +14,7 @@ class Search:
         self.files = files
 
         self.data = []
-        for i in progressbar.progressbar(range(len(files))):
+        for i in progressbar(range(len(files))):
             self.data.append(DataFile(files[i]))
         print(f"{len(self.files)} file(s) loaded.")
 
@@ -24,6 +23,12 @@ class Search:
         self.data = [df for df in self.data if df.filename in self.files]
         print(f"{len(self.files)} file(s) loaded.")
 
+    def find_angle_corr(self):
+        for mc in self.data:
+            bs = DataFile(file.info.corresponding_bs())
+            s1 = mc["angles"]
+            s2 = bs["y disp "]
+    
 
     def ls(self):
         print(f"{len(self.files)} file(s) loaded:")
@@ -31,7 +36,7 @@ class Search:
             print(f)
 
     def a(self, methodToRun, *args, verbose=False):
-        for i in progressbar.progressbar(range(len(self.data)), redirect_stdout=True):
+        for i in progressbar(range(len(self.data)), redirect_stdout=True):
             df = self.data[i]
             if verbose:
                 print(f"Applying {methodToRun.__name__} on {df.info.title_str()}")
