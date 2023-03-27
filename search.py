@@ -1,6 +1,8 @@
 from datafile import DataFile
 from glob import glob
 from utils import *
+import time
+import progressbar
 
 class Search:
     def __init__(self, *terms, csv_only=True):
@@ -10,14 +12,16 @@ class Search:
 
         files = glob("./**", recursive=True)
         files = filter_for_terms(files, *terms)
-
         self.files = files
-        self.data = [DataFile(f) for f in files]
+
+        self.data = []
+        for i in progressbar.progressbar(range(len(files))):
+            self.data.append(DataFile(files[i]))
         print(f"{len(self.files)} file(s) loaded.")
 
     def filter(self, *terms):
         self.files = filter_for_terms(self.files, *terms)
-        self.data = [DataFile(f) for f in self.files]
+        self.data = [df for df in self.data if df.filename in self.files]
         print(f"{len(self.files)} file(s) loaded.")
 
 
@@ -27,7 +31,8 @@ class Search:
             print(f)
 
     def a(self, methodToRun, *args, verbose=False):
-        for df in self.data:
+        for i in progressbar.progressbar(range(len(self.data))):
+            df = self.data[i]
             if verbose:
                 print(f"Applying {methodToRun.__name__} on {df.info.title_str()}")
             methodToRun(df, *args)
@@ -44,3 +49,6 @@ class Search:
         print(f"{len(self.data)} DataFile(s) loaded:")
         for item in self.data:
             print(item)
+
+    def __getitem__(self, index):
+        return self.data[index]

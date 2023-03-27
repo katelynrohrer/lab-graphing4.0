@@ -39,12 +39,11 @@ def get_config():
     return config
 
 def abbrevs(*dfs):
-    global abbrevs
+    global abbrevdict
     cols = []
     for file in dfs:
         cols += list(file.df.columns)
     abbrevs = abbrev(cols)
-    pprint(abbrevs)
     for key in abbrevs:
         exec(f'global {key}\n{key} = "{abbrevs[key]}"')
 

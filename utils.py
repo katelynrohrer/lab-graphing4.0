@@ -4,7 +4,8 @@ import numpy as np
 def filter_for_terms(strs, *terms):
     """
     Filters the given list of strings based on the terms given.
-    Is case-insensitive
+    Is case-insensitive. If a term begins with `!`, the search 
+    is inversed such that any items with that term are excluded.
 
     :return: a list of any strings that match all terms
     """
@@ -13,7 +14,10 @@ def filter_for_terms(strs, *terms):
     def match_fun(x): 
         x = x.lower()
         for term in terms:
-            if term not in x:
+            inv_match = term[0] == '!'
+            if inv_match and term[1:] in x:
+                return False 
+            elif not inv_match and term not in x:
                 return False
         return True
 

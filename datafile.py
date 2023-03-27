@@ -149,6 +149,8 @@ class DataFile:
             df["Seconds"] = df["Timestamp (microseconds)"].apply(
                 lambda x: x - start_time)
             df["Seconds"] = df["Seconds"].apply(lambda x: x / 1000000)
+        else:
+            print(f"seconds not found for {self.filename}")
 
 
     def graph(self, *axes, ax=None, extrema=False):
@@ -172,8 +174,8 @@ class DataFile:
 
     def reset(self):
         self.df = pd.read_csv(self.filename)
+        self.add_seconds()
 
-        # self.df = df.set_index("Seconds")
 
     def choose_col(self):
         command = "gum choose"
