@@ -31,7 +31,7 @@ class Search:
             print(f)
 
     def a(self, methodToRun, *args, verbose=False):
-        for i in progressbar.progressbar(range(len(self.data))):
+        for i in progressbar.progressbar(range(len(self.data)), redirect_stdout=True):
             df = self.data[i]
             if verbose:
                 print(f"Applying {methodToRun.__name__} on {df.info.title_str()}")
