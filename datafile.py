@@ -152,6 +152,10 @@ class DataFile:
             print(f"seconds not found for {self.filename}")
 
 
+    def print_corr(self):
+        self.info.corresponding_bs()
+
+
     def graph(self, *axes, ax=None, extrema=False):
         df = self.df
 

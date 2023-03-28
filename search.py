@@ -3,6 +3,7 @@ from glob import glob
 from utils import *
 from progressbar import progressbar
 
+
 class Search:
     def __init__(self, *terms, csv_only=True):
         terms = list(terms)

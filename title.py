@@ -40,6 +40,9 @@ class Title:
 
     def corresponding_bs(self):
         assert self.origin == "moca", "Can currently only be run on moca files"
+        
+        if self.subject == "ssi2f":
+            return
 
         folder = self.filename[:self.filename.rindex(os.sep)+1]
 
@@ -54,9 +57,9 @@ class Title:
         search_term = corresponding_muscles[self.motion]
         file = folder + f"**{search_term}*angularDisp.csv"
         search = glob.glob(file)
-
-        assert len(search) == 1, "Error finding corresponding file"
-        print(search)
+    
+        
+        assert len(search) == 1, f"Error finding corresponding file {file}"
 
         return search
 
