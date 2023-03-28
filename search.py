@@ -15,7 +15,7 @@ class Search:
         self.files = files
 
         self.data = []
-        for i in progressbar(range(len(files))):
+        for i in progressbar(range(len(files)), redirect_stdout=True):
             self.data.append(DataFile(files[i]))
         print(f"{len(self.files)} file(s) loaded.")
 
