@@ -23,11 +23,19 @@ class Title:
 
         # correlating trial info with object attributes
         if self.origin == "moca":
-            self.motion, _, self.subject, self.run, _, self.date, self.speed, = tuple(trial_info)
+            try:
+                self.motion, _, self.subject, self.run, _, self.date, self.speed = tuple(trial_info)
+            except:
+                print(f"FAILED TO GEN TITLE FOR {self.filename}")
+                return
             self.measure = "disp"
             self.muscle = "undetermined"
         else:
-            self.motion, self.muscle, self.subject, self.run, _, self.date, self.speed, self.measure = tuple(trial_info)
+            try:
+                self.motion, self.muscle, self.subject, self.run, _, self.date, self.speed, self.measure = tuple(trial_info)
+            except:
+                print(f"FAILED TO GEN TITLE FOR {self.filename}")
+                return
 
 
         # attempts to make motion and muscles strs "pretty"
