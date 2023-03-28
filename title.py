@@ -1,4 +1,5 @@
 import os
+import glob
 
 class Title:
     def __init__(self, filename):
@@ -37,49 +38,41 @@ class Title:
                 print(f"FAILED TO GEN TITLE FOR {self.filename}")
                 return
 
+    def corresponding_bs(self):
+        assert self.origin == "moca", "Can currently only be run on moca files"
 
-        # attempts to make motion and muscles strs "pretty"
-        motions = {"chestaa": "Chest Abduction/Adduction",
-                   "shoulderfe": "Shoulder Flexion/Extension",
-                   "shoulderaa": "Shoulder Abduction/Adduction",
-                   "bicepc": "Bicep Curl",
-                   "fingerp": "Finger Pinch",
-                   "bodylean": "Body Lean"}
+        folder = self.filename[:self.filename.rindex(os.sep)+1]
 
-        muscles = {"bicep": "Bicep",
-                   "brachio": "Brachioradialis",
-                   "forearm": "Forearm",
-                   "thumb": "Thumb",
-                   "index": "Index",
-                   "cspine": "Cervical Spine",
-                   "femor": "Biceps Femoris",
-                   "midspine": "Mid-Thoracic Spine",
-                   "tricep": "Tricep",
-                   "deltoid": "Medial Deltoid"}
+        corresponding_muscles = {"chestaa": "Forearm",
+                                 "shoulderfe": "Forearm",
+                                 "shoulderaa": "Forearm",
+                                 "bicepc": "Forearm",
+                                 "fingerp": "Index",
+                                 "bodylean": "CSpine"
+                                 }
 
-        origins = {"bio": "Biostamp",
-                   "moca": "MOCA"}
+        search_term = corresponding_muscles[self.motion]
+        file = folder + f"**{search_term}*angularDisp.csv"
+        search = glob.glob(file)
 
-        if self.motion in motions:
-            self.motion = motions[self.motion]
-        if self.muscle in muscles:
-            self.muscle = muscles[self.muscle]
-        if self.origin in origins:
-            self.origin = origins[self.origin]
+        assert len(search) == 1, "Error finding corresponding file"
+        print(search)
 
-    def prettify(self,str):
+        return search
+
+    def prettify(self, str):
         names = {"chestaa": "Chest Abduction/Adduction",
-                   "shoulderfe": "Shoulder Flexion/Extension",
-                   "shoulderaa": "Shoulder Abduction/Adduction",
-                   "bicepc": "Bicep Curl",
-                   "fingerp": "Finger Pinch",
-                   "bodylean": "Body Lean",
-                   "brachio": "Brachioradialis",
-                   "cspine": "Cervical Spine",
-                   "femor": "Biceps Femoris",
-                   "midspine": "Mid-Thoracic Spine",
-                   "deltoid": "Medial Deltoid",
-                   "moca": "MOCA"
+                 "shoulderfe": "Shoulder Flexion/Extension",
+                 "shoulderaa": "Shoulder Abduction/Adduction",
+                 "bicepc": "Bicep Curl",
+                 "fingerp": "Finger Pinch",
+                 "bodylean": "Body Lean",
+                 "brachio": "Brachioradialis",
+                 "cspine": "Cervical Spine",
+                 "femor": "Biceps Femoris",
+                 "midspine": "Mid-Thoracic Spine",
+                 "deltoid": "Medial Deltoid",
+                 "moca": "MOCA"
                  }
         if str in names:
             return names[str]
@@ -91,39 +84,55 @@ class Title:
         Builds title string for the graphs
         :return: Str title
         """
+        print_motion, print_muscle = self.motion, self.muscle
+        if self.motion in Title.motions:
+            print_motion = Title.motions[self.motion]
+        if self.muscle in Title.muscles:
+            print_muscle = Title.muscles[self.muscle]
 
         # Removes muscle if undetermined
-        if self.muscle == "undetermined":
-            print_muscle = ""
-        else:
+        if print_muscle != "undetermined":
             print_muscle = " " + self.muscle
 
-        return f"{self.motion} " \
+        return f"{print_motion} " \
                f"{self.subject.upper()}" \
                f"{print_muscle} " \
                f"{self.run[0:3].capitalize()} {self.run[3]} " \
                f"{self.speed.capitalize()} "
-
 
     def __str__(self):
         """
         Builds a representation of all of the file information.
         :return: Info string
         """
-        return f"Motion: {self.motion:^2} | " \
-               f"Muscle: {self.muscle:^15} | " \
-               f"Subject: {self.subject:^5} | " \
-              
+        print_motion, print_muscle = self.motion, self.muscle
+        if self.motion in Title.motions:
+            print_motion = Title.motions[self.motion]
+        if self.muscle in Title.muscles:
+            print_muscle = Title.muscles[self.muscle]
 
+        return f"Motion: {print_motion} | " \
+               f"Muscle: {print_muscle} | " \
+               f"Subject: {self.subject}" \
 
     def __repr__(self):
         """
         Builds a representation of all of the file information.
         :return: Info string
         """
-        return f"Origin: {self.origin:^8} | " \
-               f"Motion: {self.motion:^2} | " \
-               f"Muscle: {self.muscle:^15} | " \
+        print_motion, print_muscle, print_origin = \
+            self.motion, self.muscle, self.origin
+
+        if self.motion in Title.motions:
+            print_motion = Title.motions[self.motion]
+        if self.muscle in Title.muscles:
+            print_muscle = Title.muscles[self.muscle]
+        if self.origin in Title.origins:
+            print_origin = Title.origins[self.origin]
+
+        return f"Origin: {print_origin:^8} | " \
+               f"Motion: {print_motion:^2} | " \
+               f"Muscle: {print_muscle:^15} | " \
                f"Subject: {self.subject:^5} | " \
                f"Run: {self.run:^4} | " \
                f"Speed: {self.speed:^4} | " \
@@ -132,7 +141,11 @@ class Title:
                f"Epoch: {str(self.epoch):^5s} |"
 
     def csv_string(self):
-        return f"{self.motion},{self.subject},{self.run},{self.speed}"
+        print_motion = self.motion
+        if self.motion in Title.motions:
+            print_motion = Title.motions[self.motion]
+
+        return f"{print_motion},{self.subject},{self.run},{self.speed}"
 
     def pprint(self):
         """
@@ -142,12 +155,44 @@ class Title:
 
         :return: Info string 
         """
-        return f"\t| Origin: {self.origin:^8} | " \
-               f"Motion: {self.motion:^2} | " \
-               f"\n\t| Muscle: {self.muscle:^15} | " \
+        print_motion, print_muscle, print_origin = \
+            self.motion, self.muscle, self.origin
+
+        if self.motion in Title.motions:
+            print_motion = Title.motions[self.motion]
+        if self.muscle in Title.muscles:
+            print_muscle = Title.muscles[self.muscle]
+        if self.origin in Title.origins:
+            print_origin = Title.origins[self.origin]
+
+        return f"\t| Origin: {print_origin:^8} | " \
+               f"Motion: {print_motion:^2} | " \
+               f"\n\t| Muscle: {print_muscle:^15} | " \
                f"Subject: {self.subject:^5} | " \
                f"Run: {self.run:^4} | " \
                f"\n\t| Speed: {self.speed:^4} | " \
                f"Date: {self.date:^7} | " \
                f"Measure: {self.measure:^11} | " \
                f"Epoch: {str(self.epoch):^5s} |"
+
+
+    motions = {"chestaa": "Chest Abduction/Adduction",
+               "shoulderfe": "Shoulder Flexion/Extension",
+               "shoulderaa": "Shoulder Abduction/Adduction",
+               "bicepc": "Bicep Curl",
+               "fingerp": "Finger Pinch",
+               "bodylean": "Body Lean"}
+
+    muscles = {"bicep": "Bicep",
+               "brachio": "Brachioradialis",
+               "forearm": "Forearm",
+               "thumb": "Thumb",
+               "index": "Index",
+               "cspine": "Cervical Spine",
+               "femor": "Biceps Femoris",
+               "midspine": "Mid-Thoracic Spine",
+               "tricep": "Tricep",
+               "deltoid": "Medial Deltoid"}
+
+    origins = {"bio": "Biostamp",
+               "moca": "MOCA"}
