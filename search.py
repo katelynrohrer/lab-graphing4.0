@@ -1,7 +1,10 @@
 from datafile import DataFile
+import pandas as pd
 from glob import glob
 from utils import *
 from progressbar import progressbar
+from scipy.optimize import minimize_scalar
+
 
 
 class Search:
@@ -25,10 +28,56 @@ class Search:
         print(f"{len(self.files)} file(s) loaded.")
 
     def find_angle_corr(self):
+        df = pd.DataFrame()
+        df.loc[len(df)] = ["Motion", "Subject", "Run", "Speed"]
+        MOCA_col = "angles"
+        BS_col = "gyro disp y (deg)"
+
+        def corr_offset(s1, s2, offset):
+            if offset >= 0:
+                s1 = s1.iloc[offset:].reset_index(drop=True)
+                s2 = s2.iloc[:len(s1)]
+            else:
+                s2 = s2.iloc[-offset:].reset_index(drop=True)
+                s1 = s1.iloc[:len(s2)]
+
+            corr = -s1.corr(s2)
+            return corr
+
         for mc in self.data:
-            bs = DataFile(file.info.corresponding_bs())
-            s1 = mc["angles"]
-            s2 = bs["y disp "]
+            bs = DataFile(mc.info.corresponding_bs())
+            mc.resample()
+            mc.offset_zero(MOCA_col)
+            bs.resample()
+            s1 = mc.df[MOCA_col]
+            s2 = bs.df[BS_col]
+
+            a = -0.5*len(bs)
+            b = 0.5*len(mc)
+
+            res = minimize_scalar(lambda x: corr_offset(s1,s2,x), bracket=(a, b), method='bounded')
+            best_offset = res.x
+
+            if best_offset >= 0:
+                s1 = s1.iloc[best_offset:].reset_index(drop=True)
+                s2 = s2.iloc[:len(s1)]
+            else:
+                s2 = s2.iloc[-best_offset:].reset_index(drop=True)
+                s1 = s1.iloc[:len(s2)]
+
+            deltas = s1.subtract(s2)
+            avg_delta = deltas.mean()
+
+            print(f"Results for {mc.info}")
+            print("  Best offset:      {}".format(res.x))
+            print("  Best correlation: {}".format(res.fun))
+            print("  Avg angle delta:  {}".format(avg_delta))
+            df.loc[len(df)] = [*mc.info.csv_string(), res.x, res.fun, avg_delta]
+
+        return df
+
+
+
     
 
     def ls(self):

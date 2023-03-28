@@ -144,11 +144,7 @@ class Title:
                f"Epoch: {str(self.epoch):^5s} |"
 
     def csv_string(self):
-        print_motion = self.motion
-        if self.motion in Title.motions:
-            print_motion = Title.motions[self.motion]
-
-        return f"{print_motion},{self.subject},{self.run},{self.speed}"
+        return (self.motion,self.subject,self.run,self.speed)
 
     def pprint(self):
         """
