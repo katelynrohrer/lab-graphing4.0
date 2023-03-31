@@ -1,6 +1,27 @@
 import os
 import numpy as np
 
+def offset(s1,s2, offset):
+    if offset >= 0:
+        s1 = s1.iloc[offset:].reset_index(drop=True)
+        s2 = s2.iloc[:len(s1)]
+    else:
+        s2 = s2.iloc[-offset:].reset_index(drop=True)
+        s1 = s1.iloc[:len(s2)]
+    return s1, s2
+
+
+def maximize(fun,min,max):
+    max = -100
+    max_pos = 0
+    for i in range(min,max):
+        val = fun(i)
+        if val > max:
+            max = val
+            max_pos = i
+    return max, max_pos
+
+
 def filter_for_terms(strs, *terms):
     """
     Filters the given list of strings based on the terms given.

@@ -61,7 +61,7 @@ class Title:
         
         assert len(search) == 1, f"Error finding corresponding file {file}"
 
-        return search
+        return search[0]
 
     def prettify(self, str):
         names = {"chestaa": "Chest Abduction/Adduction",

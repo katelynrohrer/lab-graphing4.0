@@ -1,4 +1,5 @@
 from datafile import DataFile
+import math
 import pandas as pd
 from glob import glob
 from utils import *
@@ -28,51 +29,49 @@ class Search:
         print(f"{len(self.files)} file(s) loaded.")
 
     def find_angle_corr(self):
-        df = pd.DataFrame()
-        df.loc[len(df)] = ["Motion", "Subject", "Run", "Speed"]
+        df = pd.DataFrame(columns=["Motion", "Subject", "Run", "Speed", "offset","correlation","average angle delta", "rmse"])
         MOCA_col = "angles"
         BS_col = "gyro disp y (deg)"
 
-        def corr_offset(s1, s2, offset):
-            if offset >= 0:
-                s1 = s1.iloc[offset:].reset_index(drop=True)
-                s2 = s2.iloc[:len(s1)]
-            else:
-                s2 = s2.iloc[-offset:].reset_index(drop=True)
-                s1 = s1.iloc[:len(s2)]
-
-            corr = -s1.corr(s2)
+        def corr_offset(s1, s2, of):
+            s1, s2 = offset(s1, s2, of)
+            corr = s1.corr(s2)
             return corr
 
         for mc in self.data:
+            corresponding_file = mc.info.corresponding_bs()
+            if corresponding_file is None:
+                print(f"No corresponding file found for {mc.filename}")
+                continue
             bs = DataFile(mc.info.corresponding_bs())
+            if MOCA_col not in mc.df.columns:
+                print(f"Column {MOCA_col} not found in {mc.filename}")
+                continue
+            if BS_col not in bs.df.columns:
+                print(f"Column {BS_col} not found in {bs.filename}")
+                continue
             mc.resample()
             mc.offset_zero(MOCA_col)
             bs.resample()
             s1 = mc.df[MOCA_col]
             s2 = bs.df[BS_col]
 
-            a = -0.5*len(bs)
-            b = 0.5*len(mc)
+            a = -len(bs.df)//3
+            b = len(mc.df)//2
 
-            res = minimize_scalar(lambda x: corr_offset(s1,s2,x), bracket=(a, b), method='bounded')
-            best_offset = res.x
+            corr,best_offset = maximize(lambda x: corr_offset(s1,s2,x), a, b)
 
-            if best_offset >= 0:
-                s1 = s1.iloc[best_offset:].reset_index(drop=True)
-                s2 = s2.iloc[:len(s1)]
-            else:
-                s2 = s2.iloc[-best_offset:].reset_index(drop=True)
-                s1 = s1.iloc[:len(s2)]
+            s1, s2 = offset(s1, s2, best_offset)
 
-            deltas = s1.subtract(s2)
+            deltas = s1 - s2
             avg_delta = deltas.mean()
-
+            rmse_data = (s1 - s2)**2
+            rmse = math.sqrt(rmse_data.mean())
             print(f"Results for {mc.info}")
-            print("  Best offset:      {}".format(res.x))
-            print("  Best correlation: {}".format(res.fun))
+            print("  Best offset:      {}".format(best_offset))
+            print("  Best correlation: {}".format(corr))
             print("  Avg angle delta:  {}".format(avg_delta))
-            df.loc[len(df)] = [*mc.info.csv_string(), res.x, res.fun, avg_delta]
+            df.loc[len(df)] = [*mc.info.csv_string(), best_offset, corr, avg_delta, rmse]
 
         return df
 

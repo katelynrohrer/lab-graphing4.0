@@ -14,6 +14,10 @@ class DataFile:
         self.df = pd.read_csv(filename)
         self.add_seconds()
 
+    def make_angles_ok(self):
+        if "Angles" in self.df.columns:
+            self.df.rename(columns={'Angles': 'angles'},inplace=True)
+    
     def del_unnamed(self):
         self.df.drop("Unnamed: 0", axis=1, inplace=True)
 
