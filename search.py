@@ -38,12 +38,13 @@ class Search:
             corr = s1.corr(s2)
             return corr
 
+        # self.data contains DataFiles for MOCA 
         for mc in self.data:
             corresponding_file = mc.info.corresponding_bs()
             if corresponding_file is None:
                 print(f"No corresponding file found for {mc.filename}")
                 continue
-            bs = DataFile(mc.info.corresponding_bs())
+            bs = DataFile(corresponding_file)
             if MOCA_col not in mc.df.columns:
                 print(f"Column {MOCA_col} not found in {mc.filename}")
                 continue
@@ -57,7 +58,7 @@ class Search:
             s2 = bs.df[BS_col]
 
             a = -len(bs.df)//3
-            b = len(mc.df)//2
+            b = len(mc.df)//3
 
             corr,best_offset = maximize(lambda x: corr_offset(s1,s2,x), a, b)
 
