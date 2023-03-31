@@ -34,12 +34,21 @@ def filter_for_terms(strs, *terms):
     terms = [t.lower() for t in terms]
     def match_fun(x): 
         x = x.lower()
-        for term in terms:
-            inv_match = term[0] == '!'
-            if inv_match and term[1:] in x:
-                return False 
-            elif not inv_match and term not in x:
+        neg_terms = [term for term in terms if term[0] == '!']
+        switch_terms = [term for term in terms if '|' in term]
+        pos_terms = [term for term in terms if term not in switch_terms and term not in neg_terms]
+        for term in pos_terms:
+            if term not in x:
                 return False
+        for term in neg_terms:
+            if term in x:
+                return False
+        for term in switch_terms:
+            l = term.split('|')
+            l = map(lambda t: t in x, l)
+            if True not in l:
+                return False
+
         return True
 
     return list(filter(match_fun, strs))
