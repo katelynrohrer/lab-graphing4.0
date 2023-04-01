@@ -39,7 +39,8 @@ class Search:
             return corr
 
         # self.data contains DataFiles for MOCA 
-        for mc in self.data:
+        for i in progressbar(range(len(self.data)), redirect_stdout=True):
+            mc = self.data[i]
             corresponding_file = mc.info.corresponding_bs()
             if corresponding_file is None:
                 print(f"No corresponding file found for {mc.filename}")
