@@ -1,8 +1,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+from pandas.errors import InvalidIndexError
 from scipy.signal import argrelextrema
-from utils import prompt
+from utils import *
 from title import *
 from angle_utils import *
 
@@ -139,6 +140,46 @@ class DataFile:
             self.df.loc[:, f"{col} meters"] = self.df[col] * scale
         for col in y_cols:
             self.df.loc[:, f"{col} meters"] = self.df[col] * scale
+
+    def get_correlation(self, self_col, other, other_col, graph=False, graph_delta=False):
+        if self_col not in self.df.columns:
+            print(f"Column {self_col} not found in {self.filename}")
+            raise InvalidIndexError
+        if other_col not in other.df.columns:
+            print(f"Column {other_col} not found in {other.filename}")
+            raise InvalidIndexError
+
+        # Resample and remove any y-offset between the two
+        self.resample()
+        self.offset_zero(self_col)
+        other.resample()
+        other.offset_zero(other_col)
+
+        def corr_offset(s1, s2, of):
+            s1, s2 = offset(s1, s2, of)
+            corr = s1.corr(s2)
+            return corr
+        # Find the offset which maximizes correlation
+        s1 = self.df[self_col]
+        s2 = other.df[other_col]
+        a = -len(other.df)//3
+        b = len(self.df)//3
+        corr,best_offset = maximize(lambda x: corr_offset(s1,s2,x), a, b)
+
+        # Get output data
+        s1, s2 = offset(s1, s2, best_offset)
+        deltas = s1 - s2
+        avg_delta = deltas.mean()
+        rmse = (s1 - s2)**2
+        rmse = math.sqrt(rmse.mean())
+
+        if graph:
+            ax = s1.plot()
+            s2.plot(ax=ax)
+        if graph_delta:
+            deltas.plot()
+
+        return best_offset, corr, avg_delta, rmse
 
     def add_seconds(self):
         df = self.df
