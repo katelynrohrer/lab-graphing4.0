@@ -41,9 +41,6 @@ class Title:
     def corresponding_bs(self):
         assert self.origin == "moca", "Can currently only be run on moca files"
         
-        if self.subject == "ssi2f":
-            return
-
         folder = self.filename[:self.filename.rindex(os.sep)+1]
 
         corresponding_muscles = {"chestaa": "Forearm",
