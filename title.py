@@ -43,7 +43,7 @@ class Title:
         
         folder = self.filename[:self.filename.rindex(os.sep)+1]
 
-        corresponding_muscles = {"chestaa": "Forearm",
+        corresponding_muscles = {"chestaa": "Brachio",
                                  "shoulderfe": "Forearm",
                                  "shoulderaa": "Forearm",
                                  "bicepc": "Forearm",
