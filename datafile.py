@@ -141,6 +141,24 @@ class DataFile:
         for col in y_cols:
             self.df.loc[:, f"{col} meters"] = self.df[col] * scale
 
+    def get_angle_cor(self):
+        other = DataFile(self.info.corresponding_bs())
+        self_col = "angles"
+        other_col = ""
+        match self.info.motion:
+            case "bicepc", "fingerp":
+                other_col = "gyro disp y (deg)"
+            case "chestaa":
+                other_col = "gyro disp z (deg)"
+            case "shoulderfe":
+                other_col = "gyro disp z (deg)"
+            case "bodylean":
+                other_col = "gyro disp z (deg)"
+            case "shoulderaa":
+                other_col = "gyro disp z (deg)"
+        return self.get_correlation(self_col, other, other_col)
+
+
     def get_correlation(self, self_col, other, other_col, graph=False, graph_delta=False):
         if self_col not in self.df.columns:
             print(f"Column {self_col} not found in {self.filename}")
@@ -248,8 +266,8 @@ class DataFile:
         ilocs_max = argrelextrema(df[column].values, np.greater_equal, order=margin)[0]
 
         # filter elements that are peaks and plot
-        df.iloc[ilocs_max][column].plot(style="v", lw=10, color="green")
-        df.iloc[ilocs_min][column].plot(style="^", lw=10, color="red")
+        df.iloc[ilocs_max][column].plot(x="Seconds",style="v", lw=10, color="green")
+        df.iloc[ilocs_min][column].plot(x="Seconds",style="^", lw=10, color="red")
 
         # draw the average line of the extrema
         top_line = df.iloc[ilocs_max][column].mean()

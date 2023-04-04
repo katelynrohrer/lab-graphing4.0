@@ -34,8 +34,8 @@ class Search:
 
     def find_angle_corr(self, verbose=False):
         df = pd.DataFrame(columns=["Motion", "Subject", "Run", "Speed", "offset","correlation","average angle delta", "rmse"])
-        MOCA_col = "angles"
-        BS_col = "gyro disp y (deg)"
+        # MOCA_col = "angles"
+        # BS_col = "gyro disp y (deg)"
 
         for i in progressbar(range(len(self.data)), redirect_stdout=True):
             mc = self.data[i]
@@ -43,10 +43,8 @@ class Search:
             if other_filename is None:
                 print(f"No corresponding file found for {mc.filename}")
                 continue
-            bs = DataFile(other_filename)
-
             try:
-                data = mc.get_correlation(MOCA_col, bs, BS_col)
+                data = mc.get_angle_cor()
                 if verbose: print(f"output for {mc.info}: {data}")
                 df.loc[len(df)] = [*mc.info.csv_string(), *data]
             except InvalidIndexError:
