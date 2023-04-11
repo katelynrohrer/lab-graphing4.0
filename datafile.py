@@ -22,8 +22,12 @@ class DataFile:
     def del_unnamed(self):
         self.df.drop("Unnamed: 0", axis=1, inplace=True)
 
+    def print_title(self):
+        print()
+        print(self.info.__repr__())
+
     def add_angles(self):
-        stamps = stamps_from_motion(self.info.motion)
+        stamps = stamps_from_motion(self.info[MOTION])
         columns = columns_from_stamps(stamps, self.df.columns)
 
         for col in columns:
@@ -104,12 +108,12 @@ class DataFile:
         }
 
         e_to_h_motions = ["Chest Abduction/Adduction", "Shoulder Flexion/Extension", "Shoulder Abduction/Adduction", "Bicep Curl"]
-        if self.info.motion in e_to_h_motions:
+        if self.info[MOTION] in e_to_h_motions:
             fst_x_col = [col for col in self.df.columns if 'elbow' in col.lower() and ' x' in col.lower()]
             fst_y_col = [col for col in self.df.columns if 'elbow' in col.lower() and ' y' in col.lower()]
             snd_x_col = [col for col in self.df.columns if 'hand' in col.lower() and ' x' in col.lower()]
             snd_y_col = [col for col in self.df.columns if 'hand' in col.lower() and ' y' in col.lower()]
-        elif self.info.motion == "Finger Pinch":
+        elif self.info[MOTION] == "Finger Pinch":
             fst_x_col = [col for col in self.df.columns if 'index' in col.lower() and ' x' in col.lower()]
             fst_y_col = [col for col in self.df.columns if 'index' in col.lower() and ' y' in col.lower()]
             snd_x_col = [col for col in self.df.columns if 'thumb' in col.lower() and ' x' in col.lower()]
@@ -124,7 +128,7 @@ class DataFile:
         side2 = float(self.df[fst_x_col].iloc[0]) - float(self.df[snd_x_col].iloc[0])
 
         try:
-            limb_len_m = lens[(self.info.subject, self.info.motion)]
+            limb_len_m = lens[(self.info[SUBJECT], self.info[MOTION])]
         except KeyError:
             print("Length not found.")
             return
@@ -145,7 +149,7 @@ class DataFile:
         other = DataFile(self.info.corresponding_bs())
         self_col = "angles"
         other_col = ""
-        match self.info.motion:
+        match self.info[MOTION]:
             case "bicepc", "fingerp":
                 other_col = "gyro disp y (deg)"
             case "chestaa":
@@ -279,7 +283,7 @@ class DataFile:
         return top_line, bot_line
     
     def __str__(self):
-        return f"DataFile: \n{self.info.pprint()}"
+        return f"DataFile: \n{str(self.info)}"
 
     def __getitem__(self, item):
         return self.df[item]

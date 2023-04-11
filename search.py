@@ -45,7 +45,7 @@ class Search:
                 continue
             try:
                 data = mc.get_angle_cor()
-                if verbose: print(f"output for {mc.info}: {data}")
+                if verbose: print(f"Processed {mc.info}:\n    Offset: {data[0]}\n    Correlation: {data[1]}\n    RMSE: {data[3]}")
                 df.loc[len(df)] = [*mc.info.csv_string(), *data]
             except InvalidIndexError:
                 continue

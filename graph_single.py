@@ -5,7 +5,7 @@ import json
 import sys
 import matplotlib.pyplot as plt
 from glob import glob
-from title import Title 
+from title import *
 from datafile import DataFile
 from search import Search
 from utils import *

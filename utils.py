@@ -1,6 +1,26 @@
 import os
 import numpy as np
 
+def pretty(str):
+    names = {"chestaa": "Chest Abduction/Adduction",
+             "shoulderfe": "Shoulder Flexion/Extension",
+             "shoulderaa": "Shoulder Abduction/Adduction",
+             "bicepc": "Bicep Curl",
+             "fingerp": "Finger Pinch",
+             "bodylean": "Body Lean",
+             "brachio": "Brachioradialis",
+             "cspine": "Cervical Spine",
+             "femor": "Biceps Femoris",
+             "midspine": "Mid-Thoracic Spine",
+             "deltoid": "Medial Deltoid",
+             "moca": "MOCA",
+             "biostamp": "BioStamp",
+             }
+    if str in names:
+        return names[str]
+    else:
+        return str.title()
+
 def offset(s1,s2, offset):
     if offset >= 0:
         s1 = s1.iloc[offset:].reset_index(drop=True)
