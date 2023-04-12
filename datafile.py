@@ -23,8 +23,7 @@ class DataFile:
         self.df.drop("Unnamed: 0", axis=1, inplace=True)
 
     def print_title(self):
-        print()
-        print(self.info.__repr__())
+        print(self.info)
 
     def add_angles(self):
         stamps = stamps_from_motion(self.info[MOTION])
@@ -287,4 +286,3 @@ class DataFile:
 
     def __getitem__(self, item):
         return self.df[item]
-

@@ -7,7 +7,7 @@ def pretty(str):
              "shoulderaa": "Shoulder Abduction/Adduction",
              "bicepc": "Bicep Curl",
              "fingerp": "Finger Pinch",
-             "bodylean": "Body Lean",
+             "bodyl": "Body Lean",
              "brachio": "Brachioradialis",
              "cspine": "Cervical Spine",
              "femor": "Biceps Femoris",
@@ -18,8 +18,10 @@ def pretty(str):
              }
     if str in names:
         return names[str]
-    else:
+    elif len(str) > 5:
         return str.title()
+    else:
+        return str
 
 def offset(s1,s2, offset):
     if offset >= 0:

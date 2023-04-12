@@ -18,7 +18,7 @@ class Title:
         trial_info = path_split[-1].split(".")
         self.list = [part.lower() for part in trial_info][:-1]
         if (len(self.list) != 6):
-            print(f"Missing elements from {self.filename} ({self.list})")
+            print(f"Incorrect number of elements from {self.filename} ({self.list})")
 
     def corresponding_bs(self):
         assert self[MOTION] == "moca", "Can currently only be run on moca files"
@@ -42,39 +42,26 @@ class Title:
 
         return search[0]
 
-    def title_str(self):
-        """
-        Builds title string for the graphs
-        :return: Str title
-        """
-        return f"{pretty(self[MOTION])} " \
-               f"{self[SUBJECT].upper()} " \
-               f"{pretty(self[MUSCLE])} " \
-               f"{self[RUN]} " \
-
     def __str__(self):
         """
         Builds a representation of all of the file information.
         :return: Info string
         """
-        return f"Motion: {pretty(self[MOTION])} | " \
-               f"Muscle: {pretty(self[MUSCLE])} | " \
-               f"Subject: {pretty(self[SUBJECT])}" \
+        info = [self[MOTION], self[SUBJECT], self[RUN]]
+        return " ".join(map(pretty, info))
 
     def __repr__(self):
         """
         Builds a representation of all of the file information.
         :return: Info string
         """
-        return f"Origin: {pretty(self[ORIGIN]):^8} | " \
-               f"Motion: {pretty(self[MOTION]):^2} | " \
-               f"Muscle: {pretty(self[MUSCLE]):^15} | " \
-               f"Subject: {self[SUBJECT]:^5} | " \
-               f"Run: {self[RUN]:^4} | " \
-               f"Mode: {self[MODE]:^4} | " \
+        return f"Title({', '.join(self.list)})"
 
     def csv_string(self):
         return (self[MOTION],self[SUBJECT],self[RUN][:2], self[RUN][2:])
 
     def __getitem__(self,index):
+        if index >= len(self.list):
+            print(f"Invalid title position: {index} for file {self.filename}")
+            raise IndexError
         return self.list[index]
