@@ -109,7 +109,7 @@ def calculate_angle(center_pt_x, center_pt_y, left_x, left_y, right_x, right_y, 
     hypotenuse = math.sqrt(((left_x - right_x)**2) + ((left_y - right_y)**2))
     angle = math.degrees(math.acos(((right_side**2) + (left_side**2) - (hypotenuse**2)) / (2*right_side * left_side)))
 
-    if init_x > left_x:
+    if left_x > init_x:
         angle *= -1
 
     return angle
