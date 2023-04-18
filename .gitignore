@@ -136,3 +136,8 @@ __pycache__
 .DS_Store
 *.json
 moca_to_csv.ipynb
+
+animate-moca-movement.py
+graphics.py
+sample_file.py
+ShoulderAA.Cam1.SSI2F.Run2.MOCA.8:9:22.Fast copy.MOV
