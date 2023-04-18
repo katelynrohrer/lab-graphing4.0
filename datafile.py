@@ -14,6 +14,9 @@ class DataFile:
         self.info = Title(filename)
         self.df = pd.read_csv(filename)
         self.add_seconds()
+        self.make_angles_ok()
+        self.make_wrist_ok()
+        self.make_green_elbow_ok()
 
     def make_angles_ok(self):
         if "Angles" in self.df.columns:
