@@ -34,7 +34,7 @@ class Title:
                                  }
 
         search_term = corresponding_muscles[self[MOTION]]
-        file = folder + f"**{search_term}*angularDisp.csv"
+        file = folder + f"**{search_term}*Angular.csv"
         search = glob.glob(file)
     
         

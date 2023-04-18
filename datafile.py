@@ -18,6 +18,29 @@ class DataFile:
     def make_angles_ok(self):
         if "Angles" in self.df.columns:
             self.df.rename(columns={'Angles': 'angles'},inplace=True)
+
+    def validate_title(self):
+        v_origins = ["moca", "biostamp"]
+        v_motions = ["bicepc", "bodyl", "chestaa", "fingerp", "shoulderaa", "shoulderfe"]
+        v_subjects = ["cg1f", "ch2m", "es3f", "gsp1m", "ssi2f", "ya3m"]
+        v_muscles = ["forearm", "bicep", "brachio", "cspine", "midspine", "deltoid", "femor", "index", "thumb", "tricep"]
+        v_runs = ["r1slow", "r1fast", "r2slow", "r2fast", "r3slow", "r3fast"]
+        v_mode = ["angular", "linear", "all"]
+
+        if self.info[ORIGIN] not in v_origins:
+            print(f"INVALID ORIGIN FOR {self.info.filename}: {self.info[ORIGIN]}")
+        if self.info[MOTION] not in v_motions:
+            print(f"INVALID MOTION FOR {self.info.filename}: {self.info[MOTION]}")
+        if self.info[SUBJECT] not in v_subjects:
+            print(f"INVALID SUBJECT FOR {self.info.filename}: {self.info[SUBJECT]}")
+        if self.info[ORIGIN] == "biostamp":
+            if self.info[MUSCLE] not in v_muscles:
+                print(f"INVALID MUSCLE FOR {self.info.filename}: {self.info[MUSCLE]}")
+        if self.info[MODE] not in v_mode:
+            print(f"INVALID MODE FOR {self.info.filename}: {self.info[MODE]}")
+        if self.info[RUN] not in v_runs:
+            print(f"INVALID RUN FOR {self.info.filename}: {self.info[RUN]}")
+        
     
     def del_unnamed(self):
         self.df.drop("Unnamed: 0", axis=1, inplace=True)
@@ -155,7 +178,7 @@ class DataFile:
                 other_col = "gyro disp z (deg)"
             case "shoulderfe":
                 other_col = "gyro disp z (deg)"
-            case "bodylean":
+            case "bodyl":
                 other_col = "gyro disp z (deg)"
             case "shoulderaa":
                 other_col = "gyro disp z (deg)"
