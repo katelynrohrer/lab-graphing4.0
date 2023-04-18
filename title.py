@@ -21,7 +21,7 @@ class Title:
             print(f"Incorrect number of elements from {self.filename} ({self.list})")
 
     def corresponding_bs(self):
-        assert self[MOTION] == "moca", "Can currently only be run on moca files"
+        assert self[ORIGIN] == "moca", "Can currently only be run on moca files"
         
         folder = self.filename[:self.filename.rindex(os.sep)+1]
 
@@ -30,7 +30,7 @@ class Title:
                                  "shoulderaa": "Forearm",
                                  "bicepc": "Forearm",
                                  "fingerp": "Index",
-                                 "bodylean": "CSpine"
+                                 "bodyl": "CSpine"
                                  }
 
         search_term = corresponding_muscles[self[MOTION]]
