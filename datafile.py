@@ -66,21 +66,76 @@ class DataFile:
 
         for col in columns:
             if col not in self.df.columns:
-                print(f"ERROR | File did not have column {col}")
+                print(f"ERROR | {self.info} did not have column {col}")
                 return
 
         if len(columns) == 4:
-            start_pos_1 = self.df[columns[2]][0]
-            start_pos_2 = self.df[columns[3]][0]
-            self.df['angles'] = self.df.apply(lambda row: calculate_angle(
-                row[columns[0]], row[columns[1]], row[columns[2]], row[columns[3]],
-                start_pos_1, start_pos_2, start_pos_1), axis=1)
+            self.df['angles'] = self.df.apply(lambda row: self.adjust_angles(
+                row[columns[0]], row[columns[1]],
+                row[columns[2]], row[columns[3]],
+                None, None, columns), axis=1)
 
         elif len(columns) == 6:
-            start_pos_1 = self.df[columns[2]][0]
-            self.df['angles'] = self.df.apply(lambda row: calculate_angle(
-                row[columns[0]], row[columns[1]], row[columns[2]], row[columns[3]],
-                row[columns[4]], row[columns[5]], start_pos_1), axis=1)
+            self.df['angles'] = self.df.apply(lambda row: self.adjust_angles(
+                row[columns[0]], row[columns[1]],
+                row[columns[2]], row[columns[3]],
+                row[columns[4]], row[columns[5]], columns), axis=1)
+
+    def adjust_angles(self, pivot_x, pivot_y, fst_x, fst_y, snd_x, snd_y, columns):
+
+        if snd_x is None:
+            snd_x = self.df[columns[2]][0]
+        if snd_y is None:
+            snd_y = self.df[columns[3]][0]
+
+        if self.info[MOTION] == "chestaa":
+            cross_point = self.df[columns[3]][1]  # init forearm y
+            angle = calculate_angle(pivot_x, pivot_y, fst_x, fst_y, snd_x, snd_y)
+
+            if fst_y > cross_point:  # pt lower than init
+                angle *= -1
+            return angle
+
+        elif self.info[MOTION] == "shoulderfe":
+            forearm_cross = self.df[columns[2]][0]  # init x forearm
+            shoulder_cross = self.df[columns[1]][0]  # init y shoulder
+
+            angle = calculate_angle(pivot_x, pivot_y, fst_x, fst_y, snd_x, snd_y)
+            if fst_x < forearm_cross and pivot_y > shoulder_cross:  # pt left of init and lower than shoulder
+                angle *= -1
+
+            return angle
+
+        elif self.info[MOTION] == "shoulderaa":
+            forearm_cross = self.df[columns[2]][0]  # init x forearm
+            shoulder_cross = self.df[columns[1]][0]  # init y shoulder
+
+            angle = calculate_angle(pivot_x, pivot_y, fst_x, fst_y, snd_x, snd_y)
+            if fst_x > forearm_cross and pivot_y > shoulder_cross:  # pt right of init and lower than shoulder
+                angle *= -1
+
+            return angle
+
+        elif self.info[MOTION] == "bicepc":
+            cross_point = self.df[columns[3]][0]  # init y forearm
+
+            angle = calculate_angle(pivot_x, pivot_y, fst_x, fst_y, snd_x, snd_y)
+            if fst_y > cross_point:  # pt lower than init
+                angle *= -1
+
+            return angle
+
+        elif self.info[MOTION] == "fingerp":
+            return calculate_angle(pivot_x, pivot_y, fst_x, fst_y, snd_x, snd_y)
+
+        elif self.info[MOTION] == "bodyl":
+            cross_point = self.df[columns[3]][0]  # init c-spine y
+
+            angle = calculate_angle(pivot_x, pivot_y, fst_x, fst_y, snd_x, snd_y)
+            if fst_x > cross_point:  # pt right of init
+                angle *= -1
+
+            return angle
 
     def offset_zero(self, col):
         df = self.df
