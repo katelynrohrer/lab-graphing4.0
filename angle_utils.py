@@ -90,7 +90,7 @@ def columns_from_stamps(stamps, cols):
 
     return tuple(data)
 
-def calculate_angle(center_pt_x, center_pt_y, left_x, left_y, right_x, right_y):
+def calculate_angle(center_pt_x, center_pt_y, left_x, left_y, right_x, right_y, init_x):
     """
     Calculates the angle between three coordinate points.
     :param center_pt_x: The x coordinate of the vertex.
@@ -108,6 +108,9 @@ def calculate_angle(center_pt_x, center_pt_y, left_x, left_y, right_x, right_y):
     left_side = math.sqrt(((center_pt_x - left_x)**2) + ((center_pt_y - left_y)**2))
     hypotenuse = math.sqrt(((left_x - right_x)**2) + ((left_y - right_y)**2))
     angle = math.degrees(math.acos(((right_side**2) + (left_side**2) - (hypotenuse**2)) / (2*right_side * left_side)))
+
+    if init_x > left_x:
+        angle *= -1
 
     return angle
 

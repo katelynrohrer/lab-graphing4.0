@@ -62,12 +62,12 @@ class DataFile:
             start_pos_2 = self.df[columns[3]][0]
             self.df['angles'] = self.df.apply(lambda row: calculate_angle(
                 row[columns[0]], row[columns[1]], row[columns[2]], row[columns[3]],
-                start_pos_1, start_pos_2), axis=1)
+                start_pos_1, start_pos_2, start_pos_1), axis=1)
 
         elif len(columns) == 6:
             self.df['angles'] = self.df.apply(lambda row: calculate_angle(
                 row[columns[0]], row[columns[1]], row[columns[2]], row[columns[3]],
-                row[columns[4]], row[columns[5]]), axis=1)
+                row[columns[4]], row[columns[5]], start_pos_1), axis=1)
 
     def offset_zero(self, col):
         df = self.df
