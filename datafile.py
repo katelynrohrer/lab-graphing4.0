@@ -21,7 +21,7 @@ class DataFile:
 
     def make_wrist_ok(self):
         if "Wrist Pink X" in self.df.columns:
-            self.df.rename(columns={'Wrist Pink X': 'Hand Pink X'},inplace=True
+            self.df.rename(columns={'Wrist Pink X': 'Hand Pink X'},inplace=True)
         if "Wrist Pink Y" in self.df.columns:
             self.df.rename(columns={'Wrist Pink Y': 'Hand Pink Y'},inplace=True)
 
