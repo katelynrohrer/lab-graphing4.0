@@ -168,12 +168,14 @@ class DataFile:
         for col in y_cols:
             self.df.loc[:, f"{col} meters"] = self.df[col] * scale
 
-    def get_angle_cor(self):
+    def get_angle_cor(self, **kwargs):
         other = DataFile(self.info.corresponding_bs())
         self_col = "angles"
         other_col = ""
         match self.info[MOTION]:
-            case "bicepc", "fingerp":
+            case "bicepc":
+                other_col = "gyro disp y (deg)"
+            case "fingerp":
                 other_col = "gyro disp y (deg)"
             case "chestaa":
                 other_col = "gyro disp z (deg)"
@@ -183,15 +185,17 @@ class DataFile:
                 other_col = "gyro disp z (deg)"
             case "shoulderaa":
                 other_col = "gyro disp z (deg)"
-        return self.get_correlation(self_col, other, other_col)
+        return self.get_correlation(self_col, other, other_col, **kwargs)
 
 
     def get_correlation(self, self_col, other, other_col, graph=False, graph_delta=False):
         if self_col not in self.df.columns:
             print(f"Column {self_col} not found in {self.filename}")
+            print(f"  motion: {self.info[MOTION]}")
             raise InvalidIndexError
         if other_col not in other.df.columns:
             print(f"Column {other_col} not found in {other.filename}")
+            print(f"  motion: {other.info[MOTION]}")
             raise InvalidIndexError
 
         # Resample and remove any y-offset between the two

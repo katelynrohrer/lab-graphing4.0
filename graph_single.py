@@ -14,6 +14,7 @@ from pprint import pprint
 def newf(filename=""):
     if filename == "":
         filename = prompt("gum file")
+    print(filename)
     return DataFile(filename)
 
 def get_config():

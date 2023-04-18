@@ -64,7 +64,7 @@ def stamps_from_motion(motion):
         "shoulderaa":("shoulder", "hand"),
         "bicepc":("elbow", "shoulder", "hand"),
         "fingerp":("hand", "thumb", "index"),
-        "bodylean": ("back", "neck", "leg"),
+        "bodyl": ("back", "neck"),
     }
     return dict[motion]
 
