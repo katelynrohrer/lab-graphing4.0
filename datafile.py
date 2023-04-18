@@ -19,6 +19,18 @@ class DataFile:
         if "Angles" in self.df.columns:
             self.df.rename(columns={'Angles': 'angles'},inplace=True)
 
+    def make_wrist_ok(self):
+        if "Wrist Pink X" in self.df.columns:
+            self.df.rename(columns={'Wrist Pink X': 'Hand Pink X'},inplace=True
+        if "Wrist Pink Y" in self.df.columns:
+            self.df.rename(columns={'Wrist Pink Y': 'Hand Pink Y'},inplace=True)
+
+    def make_green_elbow_ok(self):
+        if "Green X" in self.df.columns and self.info[MOTION] == "bicepc":
+            self.df.rename(columns={'Green X': 'Elbow Green X'},inplace=True)
+        if "Green Y" in self.df.columns and self.info[MOTION] == "bicepc":
+            self.df.rename(columns={'Green Y': 'Elbow Green Y'},inplace=True)
+
     def validate_title(self):
         v_origins = ["moca", "biostamp"]
         v_motions = ["bicepc", "bodyl", "chestaa", "fingerp", "shoulderaa", "shoulderfe"]
