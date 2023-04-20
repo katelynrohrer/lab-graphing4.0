@@ -63,7 +63,7 @@ class DataFile:
     def print_title(self):
         print(self.info)
 
-    def add_angles(self):
+    def add_angles(self, debug=False):
         stamps = stamps_from_motion(self.info[MOTION])
         columns = columns_from_stamps(stamps, self.df.columns)
 
@@ -76,15 +76,15 @@ class DataFile:
             self.df['angles'] = self.df.apply(lambda row: self.adjust_angles(
                 row[columns[0]], row[columns[1]],
                 row[columns[2]], row[columns[3]],
-                None, None, columns), axis=1)
+                None, None, columns, debug), axis=1)
 
         elif len(columns) == 6:
             self.df['angles'] = self.df.apply(lambda row: self.adjust_angles(
                 row[columns[0]], row[columns[1]],
                 row[columns[2]], row[columns[3]],
-                row[columns[4]], row[columns[5]], columns), axis=1)
+                row[columns[4]], row[columns[5]], columns, debug), axis=1)
 
-    def adjust_angles(self, pivot_x, pivot_y, fst_x, fst_y, snd_x, snd_y, columns):
+    def adjust_angles(self, pivot_x, pivot_y, fst_x, fst_y, snd_x, snd_y, columns, debug):
 
         if snd_x is None:
             snd_x = self.df[columns[2]][0]
@@ -92,10 +92,12 @@ class DataFile:
             snd_y = self.df[columns[3]][0]
 
         if self.info[MOTION] == "chestaa":
-            cross_point = self.df[columns[3]][1]  # init forearm y
+            forearm_cross = self.df[columns[3]][0]  # init forearm y
+            shoulder_cross = self.df[columns[0]][0]
+
             angle = calculate_angle(pivot_x, pivot_y, fst_x, fst_y, snd_x, snd_y)
 
-            if fst_y > cross_point:  # pt lower than init
+            if fst_y < forearm_cross and pivot_x > shoulder_cross and not debug:  # pt lower than init
                 angle *= -1
             return angle
 
@@ -104,7 +106,7 @@ class DataFile:
             shoulder_cross = self.df[columns[1]][0]  # init y shoulder
 
             angle = calculate_angle(pivot_x, pivot_y, fst_x, fst_y, snd_x, snd_y)
-            if fst_x < forearm_cross and pivot_y > shoulder_cross:  # pt left of init and lower than shoulder
+            if fst_x < forearm_cross and pivot_y > shoulder_cross and not debug:  # pt left of init and lower than shoulder
                 angle *= -1
 
             return angle
@@ -114,7 +116,7 @@ class DataFile:
             shoulder_cross = self.df[columns[1]][0]  # init y shoulder
 
             angle = calculate_angle(pivot_x, pivot_y, fst_x, fst_y, snd_x, snd_y)
-            if fst_x > forearm_cross and pivot_y > shoulder_cross:  # pt right of init and lower than shoulder
+            if fst_x > forearm_cross and pivot_y > shoulder_cross and not debug:  # pt right of init and lower than shoulder
                 angle *= -1
 
             return angle
@@ -123,7 +125,7 @@ class DataFile:
             cross_point = self.df[columns[3]][0]  # init y forearm
 
             angle = calculate_angle(pivot_x, pivot_y, fst_x, fst_y, snd_x, snd_y)
-            if fst_y > cross_point:  # pt lower than init
+            if fst_y > cross_point and not debug:  # pt lower than init
                 angle *= -1
 
             return angle
@@ -135,7 +137,7 @@ class DataFile:
             cross_point = self.df[columns[3]][0]  # init c-spine y
 
             angle = calculate_angle(pivot_x, pivot_y, fst_x, fst_y, snd_x, snd_y)
-            if fst_x > cross_point:  # pt right of init
+            if fst_x > cross_point and not debug:  # pt right of init
                 angle *= -1
 
             return angle
@@ -224,6 +226,7 @@ class DataFile:
             snd_x_col = [col for col in self.df.columns if 'neck' in col.lower() and ' x' in col.lower()]
             snd_y_col = [col for col in self.df.columns if 'neck' in col.lower() and ' y' in col.lower()]
 
+
         side1 = float(self.df[fst_y_col].iloc[0]) - float(self.df[snd_y_col].iloc[0])
         side2 = float(self.df[fst_x_col].iloc[0]) - float(self.df[snd_x_col].iloc[0])
 
@@ -242,7 +245,7 @@ class DataFile:
         for col in x_cols:
             self.df.loc[:, f"{col} meters"] = self.df[col] * scale
         for col in y_cols:
-            self.df.loc[:, f"{col} meters"] = self.df[col] * scale
+            self.df.loc[:, f"{col} meters"] = self.df[col] * (scale*-1)
 
     def get_angle_cor(self, **kwargs):
         other = DataFile(self.info.corresponding_bs())
