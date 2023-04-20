@@ -83,9 +83,9 @@ def columns_from_stamps(stamps, cols):
     for col in cols:
         colwords = col.lower().split()
         for i in range(len(stamps)):
-            if stamps[i] in colwords and 'x' in colwords:
+            if stamps[i] in colwords and 'x' in colwords and "meters" in colwords:
                 data[2*i] = col
-            if stamps[i] in colwords and 'y' in colwords:
+            if stamps[i] in colwords and 'y' in colwords and "meters" in colwords:
                 data[2*i + 1] = col
 
     return tuple(data)
