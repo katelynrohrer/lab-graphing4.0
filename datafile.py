@@ -164,49 +164,56 @@ class DataFile:
         """
         # hard coded arm lengths
         lens = {
-            ("gsp1m", "Chest Abduction/Adduction"): 0.3,
-            ("gsp1m", "Shoulder Flexion/Extension"): 0.3,
-            ("gsp1m", "Shoulder Abduction/Adduction"): 0.26,
-            ("gsp1m", "Bicep Curl"): 0.265,
-            ("gsp1m", "Finger Pinch"): 0.09,
-            ("gsp1m", "Body Lean"): 0.19,
+            ("gsp1m", "chestaa"): 0.3,
+            ("gsp1m", "shoulderfe"): 0.3,
+            ("gsp1m", "shoulderaa"): 0.26,
+            ("gsp1m", "bicepc"): 0.265,
+            ("gsp1m", "fingerp"): 0.09,
+            ("gsp1m", "bodyl"): 0.19,
 
-            ("ch2m", "Chest Abduction/Adduction"): 0.3,
-            ("ch2m", "Shoulder Flexion/Extension"): 0.345,
-            ("ch2m", "Shoulder Abduction/Adduction"): 0.28,
-            ("ch2m", "Bicep Curl"): 0.315,
-            ("ch2m", "Finger Pinch"): 0.095,
-            ("ch2m", "Body Lean"): 0.25,
+            ("ch2m", "chestaa"): 0.3,
+            ("ch2m", "shoulderfe"): 0.345,
+            ("ch2m", "shoulderaa"): 0.28,
+            ("ch2m", "bicepc"): 0.315,
+            ("ch2m", "fingerp"): 0.095,
+            ("ch2m", "bodyl"): 0.25,
 
-            ("ya3m", "Chest Abduction/Adduction"): 0.3,
-            ("ya3m", "Shoulder Flexion/Extension"): 0.3,
-            ("ya3m", "Shoulder Abduction/Adduction"): 0.3,
-            ("ya3m", "Bicep Curl"): 0.34,
-            ("ya3m", "Finger Pinch"): 0.095,
-            ("ya3m", "Body Lean"): 0.25,
+            ("ya3m", "chestaa"): 0.3,
+            ("ya3m", "shoulderfe"): 0.3,
+            ("ya3m", "shoulderaa"): 0.3,
+            ("ya3m", "bicepc"): 0.34,
+            ("ya3m", "fingerp"): 0.095,
+            ("ya3m", "bodyl"): 0.25,
 
-            ("cg1f", "Chest Abduction/Adduction"): 0.28,
-            ("cg1f", "Shoulder Flexion/Extension"): 0.28,
-            ("cg1f", "Shoulder Abduction/Adduction"): 0.23,
-            ("cg1f", "Bicep Curl"): 0.27,
-            ("cg1f", "Finger Pinch"): 0.09,
-            ("cg1f", "Body Lean"): 0.27,
+            ("cg1f", "chestaa"): 0.28,
+            ("cg1f", "shoulderfe"): 0.28,
+            ("cg1f", "shoulderaa"): 0.23,
+            ("cg1f", "bicepc"): 0.27,
+            ("cg1f", "fingerp"): 0.09,
+            ("cg1f", "bodyl"): 0.27,
 
-            ("es3f", "Chest Abduction/Adduction"): 0.275,
-            ("es3f", "Shoulder Flexion/Extension"): 0.25,
-            ("es3f", "Shoulder Abduction/Adduction"): 0.245,
-            ("es3f", "Bicep Curl"): 0.26,
-            ("es3f", "Finger Pinch"): 0.08,
-            ("es3f", "Body Lean"): 0.275
+            ("es3f", "chestaa"): 0.275,
+            ("es3f", "shoulderfe"): 0.25,
+            ("es3f", "shoulderaa"): 0.245,
+            ("es3f", "bicepc"): 0.26,
+            ("es3f", "fingerp"): 0.08,
+            ("es3f", "bodyl"): 0.275,
+
+            ("ssi2f", "chestaa"): 0.304,
+            ("ssi2f", "shoulderfe"): 0.22,
+            ("ssi2f", "shoulderaa"): 0.25,
+            ("ssi2f", "bicepc"): 0.27,
+            ("ssi2f", "fingerp"): 0.08,
+            ("ssi2f", "bodyl"): 0.254
         }
 
-        e_to_h_motions = ["Chest Abduction/Adduction", "Shoulder Flexion/Extension", "Shoulder Abduction/Adduction", "Bicep Curl"]
+        e_to_h_motions = ["chestaa", "shoulderfe", "shoulderaa", "bicepc"]
         if self.info[MOTION] in e_to_h_motions:
             fst_x_col = [col for col in self.df.columns if 'elbow' in col.lower() and ' x' in col.lower()]
             fst_y_col = [col for col in self.df.columns if 'elbow' in col.lower() and ' y' in col.lower()]
             snd_x_col = [col for col in self.df.columns if 'hand' in col.lower() and ' x' in col.lower()]
             snd_y_col = [col for col in self.df.columns if 'hand' in col.lower() and ' y' in col.lower()]
-        elif self.info[MOTION] == "Finger Pinch":
+        elif self.info[MOTION] == "fingerp":
             fst_x_col = [col for col in self.df.columns if 'index' in col.lower() and ' x' in col.lower()]
             fst_y_col = [col for col in self.df.columns if 'index' in col.lower() and ' y' in col.lower()]
             snd_x_col = [col for col in self.df.columns if 'thumb' in col.lower() and ' x' in col.lower()]
@@ -223,12 +230,11 @@ class DataFile:
         try:
             limb_len_m = lens[(self.info[SUBJECT], self.info[MOTION])]
         except KeyError:
-            print("Length not found.")
+            print(f"Length not found {self.info} {self.info[MOTION]}.")
             return
 
         limb_len_px = math.sqrt((side1 ** 2) + (side2 ** 2))
         scale = limb_len_m / limb_len_px
-        print(scale)
 
         x_cols = [col for col in self.df.columns if 'x' in col.lower()]
         y_cols = [col for col in self.df.columns if 'y' in col.lower()]
