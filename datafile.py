@@ -116,16 +116,16 @@ class DataFile:
             shoulder_cross = self.df[columns[1]][0]  # init y shoulder
 
             angle = calculate_angle(pivot_x, pivot_y, fst_x, fst_y, snd_x, snd_y)
-            if fst_x > forearm_cross and pivot_y > shoulder_cross and not debug:  # pt right of init and lower than shoulder
+            if fst_x > forearm_cross and pivot_y < shoulder_cross and not debug:  # pt right of init and lower than shoulder
                 angle *= -1
 
             return angle
 
         elif self.info[MOTION] == "bicepc":
-            cross_point = self.df[columns[3]][0]  # init y forearm
+            cross_point = self.df[columns[5]][0]  # init y forearm
 
             angle = calculate_angle(pivot_x, pivot_y, fst_x, fst_y, snd_x, snd_y)
-            if fst_y > cross_point and not debug:  # pt lower than init
+            if fst_y < cross_point and not debug:  # pt lower than init
                 angle *= -1
 
             return angle
@@ -134,7 +134,7 @@ class DataFile:
             return calculate_angle(pivot_x, pivot_y, fst_x, fst_y, snd_x, snd_y)
 
         elif self.info[MOTION] == "bodyl":
-            cross_point = self.df[columns[3]][0]  # init c-spine y
+            cross_point = self.df[columns[2]][0]  # init c-spine x
 
             angle = calculate_angle(pivot_x, pivot_y, fst_x, fst_y, snd_x, snd_y)
             if fst_x > cross_point and not debug:  # pt right of init
