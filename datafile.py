@@ -106,7 +106,7 @@ class DataFile:
             shoulder_cross = self.df[columns[1]][0]  # init y shoulder
 
             angle = calculate_angle(pivot_x, pivot_y, fst_x, fst_y, snd_x, snd_y)
-            if fst_x < forearm_cross and pivot_y > shoulder_cross and not debug:  # pt left of init and lower than shoulder
+            if fst_x < forearm_cross and pivot_y < shoulder_cross and not debug:  # pt left of init and lower than shoulder
                 angle *= -1
 
             return angle

@@ -54,7 +54,7 @@ def main():
     DATA_DIR = config["data_folder"]
     os.chdir(DATA_DIR)
 
-    # put matplotlib in interactive mode
+    # p  ut matplotlib in interactive mode
     plt.ion()
 
 if __name__ == "__main__":

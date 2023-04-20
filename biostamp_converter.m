@@ -4,14 +4,14 @@ clc
 frmt = 'png';
 Fts = 16; %Label font size
 Lw = 1.5; %Line weight
-folder = '/Users/katierohrer/Desktop/MOCA/GitHub/All-Lab-Data2.0/Data/ChestAA/CH2M/R1Fast';
+folder = '/Users/melancwaly/lab/All-Lab-Data2.0/Data/BodyL/CG1F/R1Fast';
 path_to_save = folder;
 saveplot = 0;
 saveCSV = 1;
-arm_len = 0.640;
+arm_len = 0.560;
 
 
-muscles = {'Forearm', 'Brachio', 'Bicep'};
+muscles = {'CSpine', 'Deltoid','Femor', 'MidSpine', 'Tricep'};
 for trialnum = 1:length(muscles) 
     muscle = muscles{trialnum};
 
