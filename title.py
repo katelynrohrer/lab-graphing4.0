@@ -16,6 +16,7 @@ class Title:
         self.filename = filename
         path_split = filename.split(os.sep)
         trial_info = path_split[-1].split(".")
+        self.shortname = os.sep.join(path_split[-4:]) 
         self.list = [part.lower() for part in trial_info][:-1]
         if (len(self.list) != 6):
             print(f"Incorrect number of elements from {self.filename} ({self.list})")

@@ -30,9 +30,11 @@ def get_config():
         with open(config_file, 'r') as f:
             config = json.load(f)
     else:
-        folder_name = input("Enter data folder path: ")
+        data_folder = input("Enter data folder path: ")
+        image_folder = input("Enter image folder path: ")
         
-        config = {"data_folder": folder_name}
+        config = {"data_folder": data_folder,
+                  "image_folder": image_folder}
         
         with open(config_file, 'w') as f:
             json.dump(config, f)
@@ -49,6 +51,7 @@ def abbrevs(*dfs):
         exec(f'global {key}\n{key} = "{abbrevs[key]}"')
 
 def main():
+    global config
     # load config and set directory
     config = get_config()
     DATA_DIR = config["data_folder"]

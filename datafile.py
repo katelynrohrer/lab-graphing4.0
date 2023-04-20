@@ -20,7 +20,10 @@ class DataFile:
 
     def make_angles_ok(self):
         if "Angles" in self.df.columns:
+            print(f"fixed angles for {self.info}")
             self.df.rename(columns={'Angles': 'angles'},inplace=True)
+        if "angles" not in self.df.columns:
+            print(f"Angles not in {self.info}")
 
     def make_wrist_ok(self):
         if "Wrist Pink X" in self.df.columns:
@@ -267,7 +270,8 @@ class DataFile:
         return self.get_correlation(self_col, other, other_col, **kwargs)
 
 
-    def get_correlation(self, self_col, other, other_col, graph=False, graph_delta=False):
+    def get_correlation(self, self_col, other, other_col, graph=False, graph_delta=False,
+                        save_dir="",suffix=""):
         if self_col not in self.df.columns:
             print(f"Column {self_col} not found in {self.filename}")
             print(f"  motion: {self.info[MOTION]}")
@@ -307,6 +311,14 @@ class DataFile:
         if graph_delta:
             deltas.plot()
 
+        if save_dir != "":
+            short = f"{self.info.shortname[:-4]}.{suffix}.png"
+            dest = f"{save_dir}{os.sep}{short}"
+            necessary_dirs = os.sep.join(dest.split(os.sep)[:-1])
+            os.makedirs(necessary_dirs, exist_ok=True)
+            plt.savefig(dest)
+            plt.close()
+
         return best_offset, corr, avg_delta, rmse
 
     def add_seconds(self):
@@ -329,19 +341,31 @@ class DataFile:
         self.info.corresponding_bs()
 
 
-    def graph(self, *axes, ax=None, extrema=False):
+    def graph(self, *axes, ax=None, extrema=False, show=True, save_dir="", suffix=""):
         df = self.df
 
         if ax is None:
             _, ax = plt.subplots()
 
         for axis in axes:
+            if axis not in self.df.columns:
+                # print(f"Cannot graph {axis} for {self.info}")
+                continue
             if extrema: 
                 self.plot_extrema(axis)
             df.plot(x="Seconds",y=axis, kind="line", ax=ax)
 
         plt.title(str(self.info))
-        plt.show()
+
+        if show:
+            plt.show()
+        if save_dir != "":
+            short = f"{self.info.shortname[:-4]}.{suffix}.png"
+            dest = f"{save_dir}{os.sep}{short}"
+            necessary_dirs = os.sep.join(dest.split(os.sep)[:-1])
+            os.makedirs(necessary_dirs, exist_ok=True)
+            plt.savefig(dest)
+            plt.close()
 
         return ax
 

@@ -57,12 +57,12 @@ class Search:
         for f in self.files:
             print(f)
 
-    def a(self, methodToRun, *args, verbose=False):
+    def a(self, methodToRun, *args, verbose=False, **kwargs):
         for i in progressbar(range(len(self.data)), redirect_stdout=True):
             df = self.data[i]
             if verbose:
                 print(f"Applying {methodToRun.__name__} on {df.info}")
-            methodToRun(df, *args)
+            methodToRun(df, *args, **kwargs)
         print(f"Applied {methodToRun.__name__} on {len(self.files)} file(s).")
 
     def w(self, verbose=False):
