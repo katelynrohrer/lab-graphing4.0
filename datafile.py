@@ -413,7 +413,7 @@ class DataFile:
         return top_line, bot_line
     
     def __str__(self):
-        return f"DataFile: \n{str(self.info)}"
+        return f"DataFile: \n  {str(self.info)}"
 
     def __getitem__(self, item):
         return self.df[item]

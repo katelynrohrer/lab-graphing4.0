@@ -33,7 +33,7 @@ class Search:
         print(f"{len(self.files)} file(s) loaded.")
 
     def find_angle_corr(self, verbose=False):
-        df = pd.DataFrame(columns=["Motion", "Subject", "Run", "Speed", "offset","correlation","average angle delta", "rmse"])
+        df = pd.DataFrame(columns=["Motion", "Subject", "Run", "Speed", "offset","correlation","avg angle delta", "rmse"])
         # MOCA_col = "angles"
         # BS_col = "gyro disp y (deg)"
 

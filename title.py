@@ -48,7 +48,9 @@ class Title:
         Builds a representation of all of the file information.
         :return: Info string
         """
-        info = [self[MOTION], self[SUBJECT], self[RUN]]
+        info = [self[ORIGIN], self[MOTION], self[SUBJECT], self[RUN]]
+        if self[ORIGIN] == "BioStamp":
+            info.append(self[MUSCLE])
         return " ".join(map(pretty, info))
 
     def __repr__(self):
