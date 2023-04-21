@@ -49,7 +49,7 @@ class Title:
         :return: Info string
         """
         info = [self[ORIGIN], self[MOTION], self[SUBJECT], self[RUN]]
-        if self[ORIGIN] == "BioStamp":
+        if self[ORIGIN] == "biostamp":
             info.append(self[MUSCLE])
         return " ".join(map(pretty, info))
 
