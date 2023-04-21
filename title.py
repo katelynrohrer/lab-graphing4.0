@@ -26,7 +26,7 @@ class Title:
         
         folder = self.filename[:self.filename.rindex(os.sep)+1]
 
-        corresponding_muscles = {"chestaa": "Brachio",
+        corresponding_muscles = {"chestaa": "Forearm",
                                  "shoulderfe": "Forearm",
                                  "shoulderaa": "Forearm",
                                  "bicepc": "Forearm",
@@ -51,6 +51,7 @@ class Title:
         info = [self[ORIGIN], self[MOTION], self[SUBJECT], self[RUN]]
         if self[ORIGIN] == "biostamp":
             info.append(self[MUSCLE])
+            info.append(self[MODE])
         return " ".join(map(pretty, info))
 
     def __repr__(self):
