@@ -281,6 +281,8 @@ class DataFile:
             print(f"  motion: {other.info[MOTION]}")
             raise InvalidIndexError
 
+        # self.trim_same_epoch(other)
+
         # Resample and remove any y-offset between the two
         self.resample()
         self.offset_zero(self_col)
@@ -320,6 +322,28 @@ class DataFile:
             plt.close()
 
         return best_offset, corr, avg_delta, rmse
+
+    def trim_same_epoch(self, other):
+        this_start = self.df["Timestamp (microseconds)"].iloc[0]
+        other_start = other.df["Timestamp (microseconds)"].iloc[0]
+
+        if this_start < other_start:  # if this started first
+            new_start = this_start
+            i = 0
+            while new_start <= other_start:
+                new_start = self.df["Timestamp (microseconds)"].iloc[i]
+                i += 1
+            # cropping df based on timestamp value
+            self.df = self.df[self.df["Timestamp (microseconds)"] > new_start]
+
+        else:  # if other started first
+            new_start = other_start
+            i = 0
+            while new_start <= this_start:
+                new_start = other.df["Timestamp (microseconds)"].iloc[i]
+                i += 1
+            other.df = other.df[other.df["Timestamp (microseconds)"] > new_start]
+
 
     def add_seconds(self):
         df = self.df
