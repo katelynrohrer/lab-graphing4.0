@@ -23,7 +23,7 @@ def pretty(str):
     else:
         return str
 
-def offset(s1,s2, offset):
+def offset(s1, s2, offset):
     if offset >= 0:
         s1 = s1.iloc[offset:].reset_index(drop=True)
         s2 = s2.iloc[:len(s1)]
@@ -33,15 +33,15 @@ def offset(s1,s2, offset):
     return s1, s2
 
 
-def maximize(fun,min,max):
-    max = -100
+def maximize(fun, min, max):
+    max_output = -100
     max_pos = 0
     for i in range(min,max):
         val = fun(i)
-        if val > max:
-            max = val
+        if val > max_output:
+            max_output = val
             max_pos = i
-    return max, max_pos
+    return max_output, max_pos
 
 
 def filter_for_terms(strs, *terms):

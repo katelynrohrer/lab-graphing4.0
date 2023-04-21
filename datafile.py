@@ -281,13 +281,15 @@ class DataFile:
             print(f"  motion: {other.info[MOTION]}")
             raise InvalidIndexError
 
-        # self.trim_same_epoch(other)
+        self.trim_same_epoch(other)
 
         # Resample and remove any y-offset between the two
         self.resample()
         self.offset_zero(self_col)
         other.resample()
         other.offset_zero(other_col)
+        # TODO: remove insane hardcoded negative multiplication
+        other.df[other_col] = other.df[other_col].apply(lambda x: -x)
 
         def corr_offset(s1, s2, of):
             s1, s2 = offset(s1, s2, of)
@@ -296,11 +298,11 @@ class DataFile:
         # Find the offset which maximizes correlation
         s1 = self.df[self_col]
         s2 = other.df[other_col]
-        a = -len(other.df)//3
-        b = len(self.df)//3
-        corr,best_offset = maximize(lambda x: corr_offset(s1,s2,x), a, b)
+        a = -100
+        b = 100
+        corr, best_offset = maximize(lambda x: corr_offset(s1,s2,x), a, b)
 
-        # Get output data
+        # Get output dataset
         s1, s2 = offset(s1, s2, best_offset)
         deltas = s1 - s2
         avg_delta = deltas.mean()
@@ -334,7 +336,9 @@ class DataFile:
                 new_start = self.df["Timestamp (microseconds)"].iloc[i]
                 i += 1
             # cropping df based on timestamp value
-            self.df = self.df[self.df["Timestamp (microseconds)"] > new_start]
+            self.df = self.df.loc[i:]
+            self.df.reset_index(drop=True, inplace=True)
+            self.add_seconds()
 
         else:  # if other started first
             new_start = other_start
@@ -342,13 +346,13 @@ class DataFile:
             while new_start <= this_start:
                 new_start = other.df["Timestamp (microseconds)"].iloc[i]
                 i += 1
-            other.df = other.df[other.df["Timestamp (microseconds)"] > new_start]
+            other.df = other.df.loc[i:]
+            other.df.reset_index(drop=True, inplace=True)
+            other.add_seconds()
 
 
     def add_seconds(self):
         df = self.df
-        if "Seconds" in df.columns:
-            return
         if "time (s)" in df.columns:
             df["Seconds"] = df["time (s)"]
             df.drop("time (s)", axis=1, inplace=True)
