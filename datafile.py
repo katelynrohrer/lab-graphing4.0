@@ -14,7 +14,6 @@ class DataFile:
         self.info = Title(filename)
         self.df = pd.read_csv(filename)
         self.add_seconds()
-        self.make_angles_ok()
         self.make_wrist_ok()
         self.make_green_elbow_ok()
 
@@ -23,7 +22,7 @@ class DataFile:
             print(f"fixed angles for {self.info}")
             self.df.rename(columns={'Angles': 'angles'},inplace=True)
         if "angles" not in self.df.columns:
-            print(f"Angles not in {self.info}")
+            print(f"Angles not in {self.df.columns} {self.info}")
 
     def make_wrist_ok(self):
         if "Wrist Pink X" in self.df.columns:
@@ -289,7 +288,7 @@ class DataFile:
         other.resample()
         other.offset_zero(other_col)
         # TODO: remove insane hardcoded negative multiplication
-        other.df[other_col] = other.df[other_col].apply(lambda x: -x)
+        # other.df[other_col] = other.df[other_col].apply(lambda x: -x)
 
         def corr_offset(s1, s2, of):
             s1, s2 = offset(s1, s2, of)
@@ -333,6 +332,9 @@ class DataFile:
             new_start = this_start
             i = 0
             while new_start <= other_start:
+                if i == len(self.df["Timestamp (microseconds)"]):
+                    print(f"Error correlating times. No adjustment made. {self.info}")
+                    return
                 new_start = self.df["Timestamp (microseconds)"].iloc[i]
                 i += 1
             # cropping df based on timestamp value
@@ -344,6 +346,9 @@ class DataFile:
             new_start = other_start
             i = 0
             while new_start <= this_start:
+                if i == len(other.df["Timestamp (microseconds)"]):
+                    print(f"Error correlating times. No adjustment made. {self.info}")
+                    return
                 new_start = other.df["Timestamp (microseconds)"].iloc[i]
                 i += 1
             other.df = other.df.loc[i:]
