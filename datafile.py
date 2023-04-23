@@ -17,9 +17,6 @@ class DataFile:
         self.make_wrist_ok()
         self.make_green_elbow_ok()
 
-    def add_angle_vel(self):
-        self.df["angular velocity"] = self.df["angles"].diff()
-
     def make_angles_ok(self):
         if "Angles" in self.df.columns:
             print(f"fixed angles for {self.info}")
@@ -60,8 +57,7 @@ class DataFile:
             print(f"INVALID MODE FOR {self.info.filename}: {self.info[MODE]}")
         if self.info[RUN] not in v_runs:
             print(f"INVALID RUN FOR {self.info.filename}: {self.info[RUN]}")
-        
-    
+
     def del_unnamed(self):
         self.df.drop("Unnamed: 0", axis=1, inplace=True)
 
@@ -150,19 +146,19 @@ class DataFile:
     def offset_zero(self, col):
         df = self.df
         start = df[col][0]
-        df[col] = df[col].apply(lambda x : x - start) 
+        df[col] = df[col].apply(lambda x: x - start)
 
     def offset(self, amt):
-        self.df.set_index("Seconds",inplace=True)
+        self.df.set_index("Seconds", inplace=True)
         self.trim(amt, 10000000)
         self.df.reset_index(inplace=True)
         self.offset_zero("Seconds")
 
     def resample(self, sr="10000U"):
-        self.df.index = pd.to_datetime(self.df["Seconds"],unit="s")
+        self.df.index = pd.to_datetime(self.df["Seconds"], unit="s")
         self.df = self.df.resample(sr).mean()
         self.df = self.df.interpolate(method='linear')
-        self.df.reset_index(drop=True,inplace=True)
+        self.df.reset_index(drop=True, inplace=True)
 
     def px_to_m(self):
         """
@@ -231,7 +227,6 @@ class DataFile:
             snd_x_col = [col for col in self.df.columns if 'neck' in col.lower() and ' x' in col.lower()]
             snd_y_col = [col for col in self.df.columns if 'neck' in col.lower() and ' y' in col.lower()]
 
-
         side1 = float(self.df[fst_y_col].iloc[0]) - float(self.df[snd_y_col].iloc[0])
         side2 = float(self.df[fst_x_col].iloc[0]) - float(self.df[snd_x_col].iloc[0])
 
@@ -271,7 +266,6 @@ class DataFile:
                 other_col = "gyro disp z (deg)"
         return self.get_correlation(self_col, other, other_col, **kwargs)
 
-
     def get_correlation(self, self_col, other, other_col, graph=False, graph_delta=False,
                         save_dir="",suffix=""):
         if self_col not in self.df.columns:
@@ -291,18 +285,27 @@ class DataFile:
         other.resample()
         other.offset_zero(other_col)
         # TODO: remove insane hardcoded negative multiplication
-        # other.df[other_col] = other.df[other_col].apply(lambda x: -x)
+
+        flip_motions = ["chestaa"]
+        if self.info[MOTION] in flip_motions:
+            other.df[other_col] = other.df[other_col].apply(lambda x: -x)
 
         def corr_offset(s1, s2, of):
             s1, s2 = offset(s1, s2, of)
             corr = s1.corr(s2)
             return corr
+
         # Find the offset which maximizes correlation
         s1 = self.df[self_col]
         s2 = other.df[other_col]
         a = -100
         b = 100
         corr, best_offset = maximize(lambda x: corr_offset(s1,s2,x), a, b)
+
+        # if corr < 0:
+        #     other.df[other_col] = other.df[other_col].apply(lambda x: -x)
+        #     s2 = other.df[other_col]
+        #     corr, best_offset = maximize(lambda x: corr_offset(s1, s2, x), a, b)
 
         # Get output dataset
         s1, s2 = offset(s1, s2, best_offset)
@@ -312,8 +315,18 @@ class DataFile:
         rmse = math.sqrt(rmse.mean())
 
         if graph:
-            ax = s1.plot()
-            s2.plot(ax=ax)
+            ax = s1.plot(label="MOCA")
+            s2.plot(ax=ax, label="BioStamp")
+
+            dbg_title = " ".join(
+                str(self.info).split()[1:])  # removes first word (origin)
+            title = f"{self.info[MOTION]}"
+            ax.legend()
+
+            plt.xlabel("Seconds")
+            plt.ylabel("Degrees")
+            plt.title(label=f"{dbg_title} angle correlation")
+
         if graph_delta:
             deltas.plot()
 
@@ -358,7 +371,6 @@ class DataFile:
             other.df.reset_index(drop=True, inplace=True)
             other.add_seconds()
 
-
     def add_seconds(self):
         df = self.df
         if "time (s)" in df.columns:
@@ -372,10 +384,8 @@ class DataFile:
         else:
             print(f"seconds not found for {self.filename}")
 
-
     def print_corr(self):
         self.info.corresponding_bs()
-
 
     def graph(self, *axes, ax=None, extrema=False, show=True, save_dir="", suffix=""):
         df = self.df
@@ -387,7 +397,7 @@ class DataFile:
             if axis not in self.df.columns:
                 # print(f"Cannot graph {axis} for {self.info}")
                 continue
-            if extrema: 
+            if extrema:
                 self.plot_extrema(axis)
             df.plot(x="Seconds",y=axis, kind="line", ax=ax)
 
@@ -411,7 +421,6 @@ class DataFile:
     def reset(self):
         self.df = pd.read_csv(self.filename)
         self.add_seconds()
-
 
     def choose_col(self):
         command = "gum choose"
@@ -447,7 +456,7 @@ class DataFile:
             plt.axhline(y=bot_line, color="r", linestyle="-")
 
         return top_line, bot_line
-    
+
     def __str__(self):
         return f"DataFile: \n  {str(self.info)}"
 
