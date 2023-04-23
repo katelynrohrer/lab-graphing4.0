@@ -17,6 +17,9 @@ class DataFile:
         self.make_wrist_ok()
         self.make_green_elbow_ok()
 
+    def add_angle_vel(self):
+        self.df["angular velocity"] = self.df["angles"].diff()
+
     def make_angles_ok(self):
         if "Angles" in self.df.columns:
             print(f"fixed angles for {self.info}")
