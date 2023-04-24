@@ -17,6 +17,9 @@ class DataFile:
         self.make_wrist_ok()
         self.make_green_elbow_ok()
 
+    def add_angle_vel(self):
+        self.df["angular velocity"] = self.df["angles"].diff() / self.df["Seconds"].diff()
+
     def make_angles_ok(self):
         if "Angles" in self.df.columns:
             print(f"fixed angles for {self.info}")
@@ -250,6 +253,7 @@ class DataFile:
     def get_angle_cor(self, **kwargs):
         other = DataFile(self.info.corresponding_bs())
         self_col = "angles"
+        # self_col = "angular velocity"
         other_col = ""
         match self.info[MOTION]:
             case "bicepc":
@@ -257,7 +261,7 @@ class DataFile:
             case "fingerp":
                 other_col = "gyro disp y (deg)"
             case "chestaa":
-                other_col = "gyro disp z (deg)"
+                other_col = "gyro disp z (deg)" # gyro vel z (dps) Gyro Y (°/s)
             case "shoulderfe":
                 other_col = "gyro disp z (deg)"
             case "bodyl":
@@ -286,9 +290,9 @@ class DataFile:
         other.offset_zero(other_col)
         # TODO: remove insane hardcoded negative multiplication
 
-        flip_motions = ["chestaa"]
-        if self.info[MOTION] in flip_motions:
-            other.df[other_col] = other.df[other_col].apply(lambda x: -x)
+        # flip_motions = ["chestaa", "shoulderfe"]
+        # if self.info[MOTION] in flip_motions:
+        #     other.df[other_col] = other.df[other_col].apply(lambda x: -x)
 
         def corr_offset(s1, s2, of):
             s1, s2 = offset(s1, s2, of)
@@ -309,17 +313,19 @@ class DataFile:
 
         # Get output dataset
         s1, s2 = offset(s1, s2, best_offset)
+        self.df, other.df = offset(self.df, other.df, best_offset)
         deltas = s1 - s2
         avg_delta = deltas.mean()
         rmse = (s1 - s2)**2
         rmse = math.sqrt(rmse.mean())
 
         if graph:
-            ax = s1.plot(label="MOCA")
-            s2.plot(ax=ax, label="BioStamp")
+            ax = self.graph(self_col, label="MOCA")
+            other.graph(other_col, ax=ax, label="BioStamp")
+            # ax = s1.plot(label="MOCA")
+            # s2.plot(ax=ax, label="BioStamp")
 
-            dbg_title = " ".join(
-                str(self.info).split()[1:])  # removes first word (origin)
+            dbg_title = " ".join(str(self.info).split()[1:])  # removes first word (origin)
             title = f"{self.info[MOTION]}"
             ax.legend()
 
@@ -387,7 +393,7 @@ class DataFile:
     def print_corr(self):
         self.info.corresponding_bs()
 
-    def graph(self, *axes, ax=None, extrema=False, show=True, save_dir="", suffix=""):
+    def graph(self, *axes, ax=None, extrema=False, show=True, save_dir="", suffix="", **kwargs):
         df = self.df
 
         if ax is None:
@@ -399,7 +405,7 @@ class DataFile:
                 continue
             if extrema:
                 self.plot_extrema(axis)
-            df.plot(x="Seconds",y=axis, kind="line", ax=ax)
+            df.plot(x="Seconds",y=axis, kind="line", ax=ax, **kwargs)
 
         plt.title(str(self.info))
 
