@@ -39,6 +39,10 @@ class DataFile:
         if "Green Y" in self.df.columns and self.info[MOTION] == "bicepc":
             self.df.rename(columns={'Green Y': 'Elbow Green Y'},inplace=True)
 
+    def add_epoch_time_col(self, epoch):
+        self.df["Timestamp (microseconds)"] = [(epoch + i/60) * 1000000 for i in self.df["Frame #"]]
+        self.add_seconds()
+
     def validate_title(self):
         v_origins = ["moca", "biostamp"]
         v_motions = ["bicepc", "bodyl", "chestaa", "fingerp", "shoulderaa", "shoulderfe"]
