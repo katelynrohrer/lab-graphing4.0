@@ -263,7 +263,7 @@ class DataFile:
             case "chestaa":
                 other_col = "gyro disp y (deg)" # gyro vel z (dps) Gyro Y (°/s)
             case "shoulderfe":
-                other_col = "gyro disp z (deg)"
+                other_col = "gyro disp y (deg)"
             case "bodyl":
                 other_col = "gyro disp z (deg)"
             case "shoulderaa":
@@ -288,11 +288,11 @@ class DataFile:
         self.offset_zero(self_col)
         other.resample()
         other.offset_zero(other_col)
-        # TODO: remove insane hardcoded negative multiplication
-
-        # flip_motions = ["chestaa", "shoulderfe"]
-        # if self.info[MOTION] in flip_motions:
-        #     other.df[other_col] = other.df[other_col].apply(lambda x: -x)
+        
+        flip_motions =  ["shoulderaa"]
+        if self.info[MOTION] in flip_motions:
+            print(f"Being a flippy little guy for {self.info}")
+            other.df[other_col] = other.df[other_col].apply(lambda x: -x)
 
         def corr_offset(s1, s2, of):
             s1, s2 = offset(s1, s2, of)
