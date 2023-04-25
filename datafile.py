@@ -314,6 +314,10 @@ class DataFile:
         # Get output dataset
         s1, s2 = offset(s1, s2, best_offset)
         self.df, other.df = offset(self.df, other.df, best_offset)
+        self.add_seconds()
+        other.add_seconds()
+        self.offset_zero(self_col)
+        other.offset_zero(other_col)
         deltas = s1 - s2
         avg_delta = deltas.mean()
         rmse = (s1 - s2)**2
