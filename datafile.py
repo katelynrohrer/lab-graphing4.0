@@ -261,7 +261,7 @@ class DataFile:
             case "fingerp":
                 other_col = "gyro disp y (deg)"
             case "chestaa":
-                other_col = "gyro disp z (deg)" # gyro vel z (dps) Gyro Y (°/s)
+                other_col = "gyro disp y (deg)" # gyro vel z (dps) Gyro Y (°/s)
             case "shoulderfe":
                 other_col = "gyro disp z (deg)"
             case "bodyl":
