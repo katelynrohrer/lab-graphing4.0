@@ -285,7 +285,7 @@ class DataFile:
             print(f"  motion: {other.info[MOTION]}")
             raise InvalidIndexError
 
-        self.trim_same_epoch(other)
+        epoch_success = self.trim_same_epoch(other)
 
         # Resample and remove any y-offset between the two
         self.resample()
@@ -293,9 +293,9 @@ class DataFile:
         other.resample()
         other.offset_zero(other_col)
         
-        flip_motions =  ["shoulderaa"]
+        flip_motions =  ["chestaa", "shoulderaa"]
         if self.info[MOTION] in flip_motions:
-            print(f"Being a flippy little guy for {self.info}")
+            # print(f"Being a flippy little guy for {self.info}")
             other.df[other_col] = other.df[other_col].apply(lambda x: -x)
 
         def corr_offset(s1, s2, of):
@@ -306,8 +306,15 @@ class DataFile:
         # Find the offset which maximizes correlation
         s1 = self.df[self_col]
         s2 = other.df[other_col]
-        a = -100
-        b = 100
+
+        if not epoch_success:
+            a = len(self.df)//3
+            b = len(self.df)//3
+            print("Using larger adjustment range...")
+        else:
+            a = -100
+            b = 100
+
         corr, best_offset = maximize(lambda x: corr_offset(s1,s2,x), a, b)
 
         # if corr < 0:
@@ -364,26 +371,27 @@ class DataFile:
             while new_start <= other_start:
                 if i == len(self.df["Timestamp (microseconds)"]):
                     print(f"Error correlating times. No adjustment made. {self.info}")
-                    return
+                    return False
                 new_start = self.df["Timestamp (microseconds)"].iloc[i]
                 i += 1
             # cropping df based on timestamp value
             self.df = self.df.loc[i:]
             self.df.reset_index(drop=True, inplace=True)
             self.add_seconds()
-
+            return True
         else:  # if other started first
             new_start = other_start
             i = 0
             while new_start <= this_start:
                 if i == len(other.df["Timestamp (microseconds)"]):
                     print(f"Error correlating times. No adjustment made. {self.info}")
-                    return
+                    return False
                 new_start = other.df["Timestamp (microseconds)"].iloc[i]
                 i += 1
             other.df = other.df.loc[i:]
             other.df.reset_index(drop=True, inplace=True)
             other.add_seconds()
+            return True
 
     def add_seconds(self):
         df = self.df
