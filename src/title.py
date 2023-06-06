@@ -1,6 +1,6 @@
 import os
 import glob
-from utils import *
+from src.utils import *
 
 ORIGIN = 0
 MOTION = 1

@@ -5,8 +5,9 @@
 """
 import glob
 import os
-from graph_single import *
 import pandas as pd
+
+from main import *
 
 """
 File tings for katie

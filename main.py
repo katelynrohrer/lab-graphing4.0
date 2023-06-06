@@ -1,15 +1,16 @@
 import pandas as pd
-# import numpy as np
+import numpy as np
 import os
 import json
 import sys
 import matplotlib.pyplot as plt
 from glob import glob
-from title import *
-from datafile import DataFile
-from search import Search
-from utils import *
 from pprint import pprint
+
+from src.title import *
+from src.datafile import DataFile
+from src.search import Search
+from src.utils import *
 
 def newf(filename=""):
     if filename == "":

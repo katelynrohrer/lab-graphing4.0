@@ -3,9 +3,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pandas.errors import InvalidIndexError
 from scipy.signal import argrelextrema
-from utils import *
-from title import *
-from angle_utils import *
+
+from src.utils import *
+from src.title import *
+from src.angle_utils import *
 
 
 class DataFile:

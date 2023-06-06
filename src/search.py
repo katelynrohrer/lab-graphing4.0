@@ -1,12 +1,12 @@
 from pandas.errors import InvalidIndexError
-from datafile import DataFile
 import math
 import pandas as pd
 from glob import glob
-from utils import *
 from progressbar import progressbar
 from scipy.optimize import minimize_scalar
 
+from src.utils import *
+from src.datafile import DataFile
 
 
 class Search:
