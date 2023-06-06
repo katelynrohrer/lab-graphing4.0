@@ -256,22 +256,22 @@ class DataFile:
 
     def get_angle_cor(self, **kwargs):
         other = DataFile(self.info.corresponding_bs())
-        # self_col = "angles"
-        self_col = "angular velocity"
+        self_col = "angles"
+        # self_col = "angular velocity"
         other_col = ""
         match self.info[MOTION]:
             case "bicepc":
-                other_col = "gyro vel y (deg)"
+                other_col = "gyro disp y (deg)"
             case "fingerp":
-                other_col = "gyro vel y (deg)"
+                other_col = "gyro disp y (deg)"
             case "chestaa":
-                other_col = "gyro vel y (deg)" # gyro vel z (dps) Gyro Y (°/s)
+                other_col = "gyro disp y (deg)" # gyro vel z (dps) Gyro Y (°/s)
             case "shoulderfe":
-                other_col = "gyro vel y (deg)"
+                other_col = "gyro disp y (deg)"
             case "bodyl":
-                other_col = "gyro vel z (deg)"
+                other_col = "gyro disp z (deg)"
             case "shoulderaa":
-                other_col = "gyro vel z (deg)"
+                other_col = "gyro disp z (deg)"
         return self.get_correlation(self_col, other, other_col, **kwargs)
 
     def get_correlation(self, self_col, other, other_col, graph=False, graph_delta=False,
