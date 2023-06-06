@@ -1,5 +1,0 @@
-s = Search("moca", "chestaa")
-df = s.find_angle_corr()
-gdf = df.groupby("Motion")
-for row in gdf:
-    print(row)

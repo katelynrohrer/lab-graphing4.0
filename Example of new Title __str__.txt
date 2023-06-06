@@ -1,8 +1,0 @@
-// old print
-DataFile: Origin:   MOCA   | Motion: Shoulder Abduction/Adduction | Muscle:  undetermined   | Subject: ch2m  | Run: run1 | Speed: fast | Date: 7_25_22 | Measure:    disp     | Epoch: False
-
-// new print
-DataFile: 
-    | Origin:   MOCA   | Motion: Shoulder Abduction/Adduction |
-    | Muscle:  undetermined   | Subject: ch2m | Run: run1 | 
-    | Speed: fast | Date: 7_25_22 | Measure:    disp     | Epoch: False |
